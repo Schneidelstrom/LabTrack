@@ -7,6 +7,7 @@ class LogInPage extends StatelessWidget{
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'LabTrack',
+      debugShowCheckedModeBanner: false,
       home: const LoginPage(),
     );
   }
@@ -48,7 +49,11 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               Text(
                 'LabTrack',
-                style: Theme.of(context).textTheme.headlineLarge,
+                style: TextStyle(
+                  fontSize: 64,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
               const SizedBox(height: 50),
               Container(
