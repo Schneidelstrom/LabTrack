@@ -1,18 +1,5 @@
 import 'package:flutter/material.dart';
 
-class LogInPage extends StatelessWidget{
-  const LogInPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'LabTrack',
-      debugShowCheckedModeBanner: false,
-      home: const LoginPage(),
-    );
-  }
-}
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -175,7 +162,7 @@ class _LoginPageState extends State<LoginPage> {
                     },
                     child: Text(
                       'Forgot Password?',
-                      style: TextStyle(color: Colors.blue[700], fontSize: 14),
+                      style: TextStyle(color: Colors.blue, fontSize: 14),
                     ),
                   ),
                 ],
