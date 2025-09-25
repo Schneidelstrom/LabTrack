@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -19,8 +20,49 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _login() {
-    print( 'UP Mail: ${_upMailController.text}, Password: ${_passwordController.text}' );
+  Future<void> _login() async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _upMailController.text,
+          password: _passwordController.text,
+        );
+
+      User? user = userCredential.user;
+
+      if (user != null) {
+        //if (user.emailVerified) {
+          print("Login successful for ${user.email}");
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login successful!')),
+          );
+          // Navigate to the home page:
+          // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+        /*} else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please verify your email first!')),
+          );
+        }*/
+      }
+    } catch (e) {
+      print("Login Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login failed: $e')),
+      );
+    }
+  }
+
+  Future<void> _resetPassword() async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: _upMailController.text);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('If account exists, password reset email had already been sent!')),
+      );
+    } catch (e) {
+      print("Password Reset Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error sending password reset email: $e')),
+      );
+    }
   }
 
   @override
@@ -90,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                   boxShadow: [
                     BoxShadow(
                       color: Colors.grey,
-                      spreadRadius: 2,
+                      spreadRadius: 1,
                       blurRadius: 5,
                       offset: const Offset(0, 3),
                     ),
@@ -145,7 +187,7 @@ class _LoginPageState extends State<LoginPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                       textStyle: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -155,14 +197,11 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   TextButton(
                     onPressed: () {
-                      // Implement forgot password logic
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Forgot Password pressed!')),
-                      );
+                      _resetPassword();
                     },
                     child: Text(
                       'Forgot Password?',
-                      style: TextStyle(color: Colors.blue, fontSize: 14),
+                      style: TextStyle(color: Colors.blue, fontSize: 16),
                     ),
                   ),
                 ],

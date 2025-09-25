@@ -29,6 +29,13 @@
             {
               "client_id": "409104629491-i3fr4rvv1hn1br846ds7ifqqmltu47hs.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "409104629491-dljut29rg36hjhi8qlskjimnemue3hgd.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.labtrack"
+              }
             }
           ]
         }
