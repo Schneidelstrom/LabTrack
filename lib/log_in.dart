@@ -22,21 +22,19 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _login() async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: _upMailController.text,
-          password: _passwordController.text,
-        );
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+            email: _upMailController.text = "student@up.edu.ph",
+            password: _passwordController.text = "12345678",
+          );
 
       User? user = userCredential.user;
 
       if (user != null) {
         //if (user.emailVerified) {
-          print("Login successful for ${user.email}");
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login successful!')),
-          );
-          // Navigate to the home page:
-          // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+        // Navigate to the home page:
+        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+        Navigator.pushReplacementNamed(context, '/dashboard');
         /*} else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Please verify your email first!')),
@@ -45,17 +43,23 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (e) {
       print("Login Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Login failed: $e')));
     }
   }
 
   Future<void> _resetPassword() async {
     try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: _upMailController.text);
+      await FirebaseAuth.instance.sendPasswordResetEmail(
+        email: _upMailController.text,
+      );
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('If account exists, password reset email had already been sent!')),
+        const SnackBar(
+          content: Text(
+            'If account exists, password reset email had already been sent!',
+          ),
+        ),
       );
     } catch (e) {
       print("Password Reset Error: $e");
@@ -104,21 +108,30 @@ class _LoginPageState extends State<LoginPage> {
                   decoration: InputDecoration(
                     labelText: 'UP Mail',
                     hintText: 'e.g., your.name@up.edu.ph',
-                    prefixIcon: const Icon(Icons.email_outlined, color: Colors.grey),
+                    prefixIcon: const Icon(
+                      Icons.email_outlined,
+                      color: Colors.grey,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
                       borderSide: BorderSide.none, // Hide default border
                     ),
                     filled: true,
                     fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 16.0,
+                      horizontal: 16.0,
+                    ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
                       borderSide: BorderSide.none,
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      borderSide: const BorderSide(color: Colors.blueAccent, width: 2.0),
+                      borderSide: const BorderSide(
+                        color: Colors.blueAccent,
+                        width: 2.0,
+                      ),
                     ),
                   ),
                   style: const TextStyle(color: Colors.black),
@@ -144,10 +157,15 @@ class _LoginPageState extends State<LoginPage> {
                   decoration: InputDecoration(
                     labelText: 'Password',
                     hintText: 'Enter your password',
-                    prefixIcon: const Icon(Icons.lock_outline, color: Colors.grey),
+                    prefixIcon: const Icon(
+                      Icons.lock_outline,
+                      color: Colors.grey,
+                    ),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                        _isPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                         color: Colors.grey,
                       ),
                       onPressed: () {
@@ -162,14 +180,20 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     filled: true,
                     fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 16.0,
+                      horizontal: 16.0,
+                    ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
                       borderSide: BorderSide.none,
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      borderSide: const BorderSide(color: Colors.blueAccent, width: 2.0),
+                      borderSide: const BorderSide(
+                        color: Colors.blueAccent,
+                        width: 2.0,
+                      ),
                     ),
                   ),
                   style: const TextStyle(color: Colors.black),
@@ -187,7 +211,10 @@ class _LoginPageState extends State<LoginPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 40,
+                        vertical: 16,
+                      ),
                       textStyle: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
