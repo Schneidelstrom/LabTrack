@@ -114,7 +114,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),
-                      borderSide: BorderSide.none, // Hide default border
+                      borderSide: BorderSide.none,
                     ),
                     filled: true,
                     fillColor: Colors.white,
@@ -206,10 +206,10 @@ class _LoginPageState extends State<LoginPage> {
                   ElevatedButton(
                     onPressed: _login,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
+                      backgroundColor: Colors.blue.shade900,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
+                        borderRadius: BorderRadius.circular(12.0),
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 40,
@@ -228,7 +228,7 @@ class _LoginPageState extends State<LoginPage> {
                     },
                     child: Text(
                       'Forgot Password?',
-                      style: TextStyle(color: Colors.blue, fontSize: 16),
+                      style: TextStyle(color: Colors.blue.shade900, fontSize: 16),
                     ),
                   ),
                 ],

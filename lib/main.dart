@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:labtrack/log_in.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:labtrack/firebase_options.dart';
-import 'package:labtrack/staff/dashboard.dart';
+import 'package:labtrack/student/dashboard.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +21,7 @@ class LogInPage extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routes: {
         '/login': (context) => const LoginPage(),
-        '/dashboard': (context) => StaffDashboard(),
+        '/dashboard': (context) => StudentDashboard(),
       },
     );
   }
