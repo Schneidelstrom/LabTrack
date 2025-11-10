@@ -34,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
         //if (user.emailVerified) {
         // Navigate to the home page:
         // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()));
-        Navigator.pushReplacementNamed(context, '/dashboard');
+        Navigator.pushReplacementNamed(context, '/main');
         /*} else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Please verify your email first!')),
