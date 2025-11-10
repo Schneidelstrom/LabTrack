@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../reusables.dart';
 
 class StudentDashboard extends StatefulWidget {
   const StudentDashboard({super.key});
@@ -13,19 +14,19 @@ class _StudentDashboardState extends State<StudentDashboard> {
 
   final List<Map<String, dynamic>> _borrowedItems = const [
     {
-      'itemName': 'Microscope',
+      'courseCode': 'BIO-101',
+      'itemCount': 10,
       'daysLeft': 9,
-      'icon': Icons.biotech_rounded
     },
     {
-      'itemName': 'Beaker Set',
+      'courseCode': 'CHEM-103',
+      'itemCount': 13,
       'daysLeft': 12,
-      'icon': Icons.science_rounded
     },
     {
-      'itemName': 'pH Meter',
+      'courseCode': 'ECO-97',
+      'itemCount': 7,
       'daysLeft': 15,
-      'icon': Icons.thermostat_rounded
     },
   ];
 
@@ -49,59 +50,10 @@ class _StudentDashboardState extends State<StudentDashboard> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-
     final currentItem = _borrowedItems[_currentBorrowedItemIndex];
-
     return Scaffold(
       key: _scaffoldKey,
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue.shade900,
-              ),
-              child: const Center(
-                child: Text(
-                  'Menu',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.add_shopping_cart, color: Color(0xFF0D47A1)),
-              title: const Text('New Borrow Request'),
-              onTap: () => print("Tapped on New Borrow Request")
-            ),
-            ListTile(
-              leading: const Icon(Icons.history, color: Color(0xFF0D47A1)),
-              title: const Text('My History & Transactions'),
-              onTap: () => print("Tapped on My History & Transactions")
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text('My Profile'),
-              onTap: () => print("Tapped on My Profile")
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Application Settings'),
-              onTap: () => print("Tapped on My Profile")
-            ),
-            ListTile(
-              leading: const Icon(Icons.exit_to_app, color: Colors.grey),
-              title: const Text('Logout'),
-              onTap: () => _showLogoutConfirmationDialog(context),
-            ),
-          ],
-        ),
-      ),
+      drawer: buildAppDrawer(context, selectedIndex: 0),
       appBar: AppBar(
         backgroundColor: Colors.blue.shade900,
         title: const Text('Dashboard'),
@@ -127,41 +79,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
           },
         ),
         actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.person_outline, color: Colors.white),
-            offset: const Offset(0, 48),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            elevation: 8,
-            onSelected: (String result){
-              switch (result) {
-                case 'Profile':
-                /* TODO: Navigate to Profile Screen */
-                  break;
-                case 'Settings':
-                /* TODO: Navigate to Settings Screen */
-                  break;
-                case 'Logout':
-                  _showLogoutConfirmationDialog(context);
-                  break;
-              }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
-                value: 'Profile',
-                child: Text('Profile'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'Settings',
-                child: Text('Settings'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'Logout',
-                child: Text('Logout'),
-              ),
-            ],
-          ),
+          buildProfilePopupMenuButton(context),
         ],
       ),
       body: SingleChildScrollView(
@@ -188,7 +106,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                     color: colorScheme.error,
                   ),
                   label: Text(
-                    '2 Penalties',
+                    'Penalty',
                     style: TextStyle(
                       fontSize: 16.0,
                       color: colorScheme.error,
@@ -209,9 +127,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
                 Expanded(
                   child: _buildCurrentlyBorrowedCard(
                     context: context,
-                    itemName: currentItem['itemName']!,
+                    courseCode: currentItem['courseCode']!,
+                    itemCount: currentItem['itemCount'],
                     daysLeft: currentItem['daysLeft'] as int,
-                    itemIcon: currentItem['icon'] as IconData,
                   ),
                 ),
                 IconButton(
@@ -234,24 +152,24 @@ class _StudentDashboardState extends State<StudentDashboard> {
                   context: context,
                   title: 'Waitlist',
                   items: const [
-                    {'name': 'Volumetric Flask', 'status': '#2'},
-                    {'name': 'Graduated Cylinder', 'status': 'PICK-UP'},
+                    {'name': 'BIO-1', 'status': '#2'},
+                    {'name': 'ENVI-1', 'status': 'PICK-UP'},
                   ],
                 ),
                 _buildSummaryCard(
                   context: context,
                   title: 'Recently Returned',
                   items: const [
-                    {'name': 'Beaker', 'status': '5x'},
-                    {'name': 'pH Meter', 'status': '1x'},
+                    {'name': 'BIO-2', 'status': 'COMPLETE'},
+                    {'name': 'PHYSICS-94', 'status': 'PARTIAL'},
                   ],
                 ),
                 _buildSummaryCard(
                   context: context,
                   title: 'Pending Borrow',
                   items: const [
-                    {'name': 'Petri Dish', 'status': '5x'},
-                    {'name': 'Thermometer', 'status': '2x'},
+                    {'name': 'PHYSICS-105', 'status': '13x'},
+                    {'name': 'ECO-34', 'status': '16x'},
                   ],
                 ),
                 _buildSummaryCard(
@@ -299,146 +217,57 @@ class _StudentDashboardState extends State<StudentDashboard> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        onTap: (index) {
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_filled, color: Color(0xFF0D47A1)),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt_outlined, color: Color(0xFF0D47A1)),
-            label: 'Transactions',
-          )
-        ],
-      ),
     );
   }
 
-  void _showLogoutConfirmationDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          contentPadding: EdgeInsets.zero,
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 0.0),
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-                  child: const Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Are you sure you\nwant to log out?',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                      ),
-                      SizedBox(height: 6),
-                    ],
-                  ),
-                ),
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.of(dialogContext).pop();
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                          '/login', (Route<dynamic> route) => false,
-                        );
-                      },
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.red.shade900,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 24),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(16),
-                          ),
-                        ),
-                        minimumSize: Size.zero,
-                      ),
-                      child: const Text('Yes', style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.of(dialogContext).pop();
-                      },
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.blue.shade900,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 24),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            bottomRight: Radius.circular(16),
-                          ),
-                        ),
-                        minimumSize: Size.zero,
-                      ),
-                      child: const Text('No', style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildCurrentlyBorrowedCard({
-    required BuildContext context,
-    required String itemName,
-    required int daysLeft,
-    required IconData itemIcon,
-  }) {
+  Widget _buildCurrentlyBorrowedCard({required BuildContext context, required String courseCode, required int itemCount, required int daysLeft}){
     return Card(
       elevation: 8,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.0),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       shadowColor: Theme.of(context).shadowColor,
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize:
-          MainAxisSize.min,
-          children: [
-            Icon(
-              itemIcon,
-              size: 60,
-              color: const Color(0xFF0D47A1),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(20.0),
+        child: InkWell(
+          onTap: () {
+            print('Borrowed Item Card for $courseCode clicked!');
+            /* TODO: Navigate to the details screen for this item */
+          },
+          borderRadius: BorderRadius.circular(20.0),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize:
+              MainAxisSize.min,
+              children: [
+                Text(
+                  courseCode,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: Colors.blue.shade900),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '$daysLeft days left',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                    ),
+                    Text(
+                      '$itemCount items',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  '${_currentBorrowedItemIndex + 1} of ${_borrowedItems.length}',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            Text(
-              itemName,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '$daysLeft days left',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.grey[600]),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              '${_currentBorrowedItemIndex + 1} of ${_borrowedItems.length}',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ],
+          ),
         ),
       ),
     );
