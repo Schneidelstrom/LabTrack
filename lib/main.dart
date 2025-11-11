@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:labtrack/log_in.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-import 'student/navigatorscreen.dart';
+import 'package:labtrack/firebase_options.dart';
+import 'package:labtrack/student/navigatorscreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
