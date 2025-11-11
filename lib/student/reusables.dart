@@ -36,7 +36,6 @@ Drawer buildAppDrawer(BuildContext context, {required int selectedIndex}) {
           title: const Text('Inventory'),
           onTap: () => handleNavigation(0),
         ),
-        //const Divider(),
       ],
     ),
   );

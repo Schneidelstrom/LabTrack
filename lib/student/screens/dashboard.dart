@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:labtrack/student/screens/borrow.dart';
-import '../reusables.dart';
+import 'package:labtrack/student/screens/report.dart';
+import 'package:labtrack/student/reusables.dart';
 
 class StudentDashboard extends StatefulWidget {
   const StudentDashboard({super.key});
@@ -200,9 +201,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () => print("Pressed on Report")
-                      /* TODO: Navigate to Report Screen */
-                    ,
+                    onPressed: () => {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentReport()))
+                    },
                     icon: const Icon(Icons.report_problem_outlined),
                     label: const Text('Report'),
                     style: OutlinedButton.styleFrom(

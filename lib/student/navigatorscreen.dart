@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'screens/dashboard.dart';
-import 'screens/transactions.dart';
+import 'package:labtrack/student/screens/dashboard.dart';
+import 'package:labtrack/student/screens/transactions.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});

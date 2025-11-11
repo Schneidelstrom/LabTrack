@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../reusables.dart';
+import 'package:labtrack/student/reusables.dart';
 
 class StudentTransactions extends StatefulWidget {
   const StudentTransactions({super.key});

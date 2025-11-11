@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import '../reusables.dart';
+import 'package:labtrack/student/screens/checkout.dart';
+import 'package:labtrack/student/reusables.dart';
+import 'package:labtrack/student/models/group_member.dart';
+import 'package:labtrack/student/models/course.dart';
 
 class _DummyItem {
   final String name;
@@ -19,6 +22,8 @@ class StudentBorrow extends StatefulWidget {
 class _StudentBorrowState extends State<StudentBorrow> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final Set<String> _selectedItemNames = {};
+  Set<GroupMember> _currentGroupMembers = {};
+  Course? _currentCourse;
 
   final List<_DummyItem> _items = const [
     _DummyItem(name: 'Beaker', stock: 5, category: 'Glassware'),
@@ -40,6 +45,28 @@ class _StudentBorrowState extends State<StudentBorrow> {
       }
     });
     print('Current selected items: ${_selectedItemNames.length}');
+  }
+
+  Future<void> _navigateToCheckout() async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => StudentCheckout(
+          selectedItems: _selectedItemNames,
+          initialGroupMembers: _currentGroupMembers,
+          initialCourse: _currentCourse,
+        ),
+      ),
+    );
+
+    if (result is Map<String, dynamic>) {
+      setState(() {
+        _currentGroupMembers = result['groupMembers'] as Set<GroupMember>;
+        _currentCourse = result['courseCode'] as Course?;
+
+        print('Group members retained: ${_currentGroupMembers.map((m) => m.name).join(', ')}');
+        print('Course Code retained: ${_currentCourse?.code}');
+      });
+    }
   }
 
   @override
@@ -104,41 +131,39 @@ class _StudentBorrowState extends State<StudentBorrow> {
             ),
           ],
         ),
-        bottomNavigationBar: _BottomCartBar(itemCount: _selectedItemNames.length)
+        bottomNavigationBar: _BottomCartBar(itemCount: _selectedItemNames.length, selectedItemNames: _selectedItemNames, onCheckoutPressed: _navigateToCheckout)
       ),
     );
   }
   Future<bool> _onWillPop(BuildContext context) async {
     if (_scaffoldKey.currentState?.isDrawerOpen == true) {
       Navigator.of(context).pop();
-      return Future.value(false);
+      return false;
     }
-    return await _showExitConfirmationDialog(context) ?? false;
+    if (_selectedItemNames.isNotEmpty) {
+      return await _showExitConfirmationDialog(context) ?? false;
+    }
+    return true;
   }
 }
 
 class _BottomCartBar extends StatelessWidget {
+  final Set<String> selectedItemNames;
   final int itemCount;
+  final VoidCallback onCheckoutPressed;
 
-  const _BottomCartBar({required this.itemCount});
+  const _BottomCartBar({required this.itemCount, required this.selectedItemNames, required this.onCheckoutPressed});
 
   @override
   Widget build(BuildContext context) {
-    // Only show the bar if at least one item is selected
-    if (itemCount == 0) {
-      return const SizedBox.shrink();
-    }
+    if (itemCount == 0) return const SizedBox.shrink();
 
     return Container(
       height: 60,
       decoration: BoxDecoration(
         color: Colors.blue.shade900,
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10,
-            offset: Offset(0, -5),
-          ),
+          BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, -5)),
         ],
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -154,10 +179,7 @@ class _BottomCartBar extends StatelessWidget {
             ),
           ),
           ElevatedButton.icon(
-            onPressed: () {
-              // TODO: Implement navigation to the Borrow Cart screen
-              print('Navigating to Borrow Cart with $itemCount selected items');
-            },
+            onPressed: onCheckoutPressed,
             icon: const Icon(Icons.shopping_cart, size: 20),
             label: const Text(
               'Go to Borrow Cart',
