@@ -14,7 +14,7 @@ class _StudentTransactionsState extends State<StudentTransactions> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: buildAppDrawer(context, selectedIndex: 1),
+      drawer: buildAppDrawer(context, selectedIndex: 0),
       appBar: AppBar(
         backgroundColor: Colors.blue.shade900,
         title: const Text('Transaction History'),

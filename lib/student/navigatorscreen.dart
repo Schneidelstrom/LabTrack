@@ -14,7 +14,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _widgetOptions = <Widget>[
     const StudentDashboard(),
-    const StudentTransactions(),
+    const StudentTransactions()
   ];
 
   void _onItemTapped(int index) {

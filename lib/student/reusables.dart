@@ -117,7 +117,6 @@ void _showLogoutConfirmationDialog(BuildContext context) {
                   child: TextButton(
                     onPressed: () {
                       Navigator.of(dialogContext).pop();
-                      // Assuming '/login' is your login route
                       Navigator.of(context).pushNamedAndRemoveUntil(
                         '/login', (Route<dynamic> route) => false,
                       );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:labtrack/student/screens/borrow.dart';
 import '../reusables.dart';
 
 class StudentDashboard extends StatefulWidget {
@@ -48,8 +49,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
     final currentItem = _borrowedItems[_currentBorrowedItemIndex];
     return Scaffold(
       key: _scaffoldKey,
@@ -92,7 +91,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
               children: [
                 Text(
                   'Welcome, Student!',
-                  style: textTheme.titleLarge?.copyWith(
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -103,13 +102,13 @@ class _StudentDashboardState extends State<StudentDashboard> {
                   icon: Icon(
                     Icons.warning_amber_rounded,
                     size: 24.0,
-                    color: colorScheme.error,
+                    color: Theme.of(context).colorScheme.error,
                   ),
                   label: Text(
                     'Penalty',
                     style: TextStyle(
                       fontSize: 16.0,
-                      color: colorScheme.error,
+                      color: Theme.of(context).colorScheme.error,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -187,9 +186,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () => print("Pressed on Borrow")
-                      /* TODO: Navigate to Borrow Screen */
-                    ,
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentBorrow()));
+                    },
                     icon: const Icon(Icons.add_shopping_cart, color: Color(0xFF0D47A1)),
                     label: const Text('Borrow', style: TextStyle(color: Color(0xFF0D47A1))),
 
@@ -208,7 +207,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                     label: const Text('Report'),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      foregroundColor: colorScheme.secondary,
+                      foregroundColor: Theme.of(context).colorScheme.secondary,
                     ),
                   ),
                 ),
