@@ -3,6 +3,7 @@ import 'package:labtrack/student/screens/borrow.dart';
 import 'package:labtrack/student/screens/report.dart';
 import 'package:labtrack/student/reusables.dart';
 import 'package:labtrack/student/screens/waitlist.dart';
+import 'package:labtrack/student/screens/return.dart';
 
 class StudentDashboard extends StatefulWidget {
   const StudentDashboard({super.key});
@@ -286,6 +287,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
         child: InkWell(
           onTap: () {
             if (title == 'Waitlist') Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentWaitlist()));
+            else if (title == 'Returned') Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentReturn()));
             print('Tapped on the $title summary card!');
           },
           borderRadius: BorderRadius.circular(20.0),
