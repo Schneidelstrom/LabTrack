@@ -43,6 +43,7 @@ class _StudentReportState extends State<StudentReport> {
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
+        iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
         elevation: 10,
         shape: const RoundedRectangleBorder(
@@ -67,6 +68,7 @@ class _StudentReportState extends State<StudentReport> {
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
+        iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
         elevation: 10,
         shape: const RoundedRectangleBorder(
@@ -76,13 +78,6 @@ class _StudentReportState extends State<StudentReport> {
           ),
         ),
         shadowColor: Colors.black,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.white),
-          iconSize: 30,
-          onPressed: () {
-            _scaffoldKey.currentState?.openDrawer();
-          },
-        ),
         actions: [
           buildProfilePopupMenuButton(context),
         ],

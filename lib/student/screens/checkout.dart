@@ -95,6 +95,7 @@ class _StudentCheckoutState extends State<StudentCheckout> {
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
+        iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
         elevation: 10,
         shape: const RoundedRectangleBorder(

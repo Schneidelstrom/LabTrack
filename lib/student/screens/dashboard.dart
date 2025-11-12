@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:labtrack/student/screens/borrow.dart';
 import 'package:labtrack/student/screens/report.dart';
 import 'package:labtrack/student/reusables.dart';
+import 'package:labtrack/student/screens/waitlist.dart';
 
 class StudentDashboard extends StatefulWidget {
   const StudentDashboard({super.key});
@@ -62,6 +63,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
+        iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
         elevation: 10,
         shape: const RoundedRectangleBorder(
@@ -71,13 +73,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
           ),
         ),
         shadowColor: Colors.black,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.white),
-          iconSize: 30,
-          onPressed: () {
-            _scaffoldKey.currentState?.openDrawer();
-          },
-        ),
         actions: [
           buildProfilePopupMenuButton(context),
         ],
@@ -158,7 +153,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                 ),
                 _buildSummaryCard(
                   context: context,
-                  title: 'Recently Returned',
+                  title: 'Returned',
                   items: const [
                     {'name': 'BIO-2', 'status': 'COMPLETE'},
                     {'name': 'PHYSICS-94', 'status': 'PARTIAL'},
@@ -290,6 +285,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
         borderRadius: BorderRadius.circular(20.0),
         child: InkWell(
           onTap: () {
+            if (title == 'Waitlist') Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentWaitlist()));
             print('Tapped on the $title summary card!');
           },
           borderRadius: BorderRadius.circular(20.0),
@@ -347,9 +343,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
 
   Color _getStatusColor(String status, BuildContext context) {
     if (status.toUpperCase() == 'PICK-UP') {
-      return Colors.amber.shade700;
+      return Colors.green.shade700;
     } else if (status.contains('#')) {
-      return Theme.of(context).colorScheme.error;
+      return Colors.orange.shade800;
     }
     return Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black;
   }

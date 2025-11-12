@@ -57,7 +57,7 @@ PopupMenuButton<String> buildProfilePopupMenuButton(BuildContext context) {
   }
 
   return PopupMenuButton<String>(
-    icon: const Icon(Icons.person_outline, color: Colors.white),
+    icon: const Icon(Icons.person_outline),
     offset: const Offset(0, 48),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(12),
