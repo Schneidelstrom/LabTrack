@@ -6,6 +6,9 @@ import 'package:labtrack/student/screens/waitlist.dart';
 import 'package:labtrack/student/screens/return.dart';
 import 'package:labtrack/student/screens/request.dart';
 import 'package:labtrack/student/screens/reported.dart';
+import 'package:labtrack/student/screens/penalty.dart';
+import 'package:labtrack/student/screens/borrowed.dart';
+import 'package:labtrack/student/models/borrow_transaction.dart';
 
 class StudentDashboard extends StatefulWidget {
   const StudentDashboard({super.key});
@@ -17,30 +20,61 @@ class StudentDashboard extends StatefulWidget {
 class _StudentDashboardState extends State<StudentDashboard> {
   int _currentBorrowedItemIndex = 0;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final List<Map<String, dynamic>> _borrowedItems = const [
-    {
-      'courseCode': 'BIO-101',
-      'itemCount': 10,
-      'daysLeft': -1,
-    },
-    {
-      'courseCode': 'CHEM-103',
-      'itemCount': 13,
-      'daysLeft': 0,
-    },
-    {
-      'courseCode': 'ECO-97',
-      'itemCount': 7,
-      'daysLeft': 15,
-    },
+
+  final List<BorrowTransaction> _borrowedItems = const [
+    const BorrowTransaction(
+      transactionId: 'TXN-00123',
+      courseCode: 'BIO-101',
+      courseName: 'General Biology',
+      borrowerName: 'John Doe',
+      dateBorrowed: '2025-11-10',
+      deadlineDate: '2025-11-12',
+      groupMembers: ['John Doe', 'Jane Smith', 'Peter Jones'],
+      borrowedItems: const [
+        const {'name': 'Microscope', 'quantity': 5},
+        const {'name': 'Slide Set', 'quantity': 5},
+      ],
+    ),
+    const BorrowTransaction(
+      transactionId: 'TXN-00124',
+      courseCode: 'CHEM-103',
+      courseName: 'Organic Chemistry',
+      borrowerName: 'Alice Johnson',
+      dateBorrowed: '2025-11-01',
+      deadlineDate: '2025-11-13',
+      groupMembers: const ['Alice Johnson', 'Bob Brown'],
+      borrowedItems: const [
+        const {'name': 'Test Tube Rack', 'quantity': 1},
+        const {'name': 'Safety Goggles', 'quantity': 12},
+      ],
+    ),
+    const BorrowTransaction(
+      transactionId: 'TXN-00125',
+      courseCode: 'ECO-97',
+      courseName: 'Physics Lab',
+      borrowerName: 'Emma Wilson',
+      dateBorrowed: '2025-11-10',
+      deadlineDate: '2025-11-28',
+      groupMembers: const ['Emma Wilson', 'Mamma Mia', 'Dadda', 'asdfwfasgfighasjdf', 'afqwefafsdf'],
+      borrowedItems: const [
+        const {'name': 'Digital Multimeter', 'quantity': 7},
+      ],
+    ),
   ];
 
   late final bool _hasPenalty;
 
+  int _calculateDaysLeft(String deadlineDate) {
+    final now = DateTime.now();
+    final deadline = DateTime.parse(deadlineDate);
+    final difference = deadline.difference(now);
+    return difference.inDays;
+  }
+
   @override
   void initState() {
     super.initState();
-    _hasPenalty = _borrowedItems.any((item) => item['daysLeft']! < 0);
+    _hasPenalty = _borrowedItems.any((item) => _calculateDaysLeft(item.deadlineDate) < 0);
   }
 
   void _navigateBorrowedItems(bool isNext) {
@@ -61,7 +95,11 @@ class _StudentDashboardState extends State<StudentDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    final currentItem = _borrowedItems[_currentBorrowedItemIndex];
+    final currentTransaction = _borrowedItems[_currentBorrowedItemIndex];
+    final int daysLeft = _calculateDaysLeft(currentTransaction.deadlineDate);
+
+    final int itemCount = currentTransaction.borrowedItems.length;
+
     return Scaffold(
       key: _scaffoldKey,
       drawer: buildAppDrawer(context, selectedIndex: 0),
@@ -101,9 +139,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
                 ),
                 if (_hasPenalty)
                   TextButton.icon(
-                    onPressed: () => print("Pressed on Penalties")
-                    /* TODO: Navigate to Penalties Screen */
-                    ,
+                    onPressed: () => {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentPenalty()))
+                    },
                     icon: Icon(
                       Icons.warning_amber_rounded,
                       size: 24.0,
@@ -131,9 +169,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
                 Expanded(
                   child: _buildCurrentlyBorrowedCard(
                     context: context,
-                    courseCode: currentItem['courseCode']!,
-                    itemCount: currentItem['itemCount'],
-                    daysLeft: currentItem['daysLeft'] as int,
+                    transaction: currentTransaction,
+                    itemCount: itemCount,
+                    daysLeft: daysLeft,
                   ),
                 ),
                 IconButton(
@@ -190,29 +228,51 @@ class _StudentDashboardState extends State<StudentDashboard> {
             Row(
               children: [
                 Expanded(
-                  child: ElevatedButton.icon(
+                  child: ElevatedButton(
                     onPressed: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentBorrow()));
                     },
-                    icon: const Icon(Icons.add_shopping_cart, color: Color(0xFF0D47A1)),
-                    label: const Text('Borrow', style: TextStyle(color: Color(0xFF0D47A1))),
-
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      backgroundColor: Colors.grey.shade100,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                          side: const BorderSide(color: Colors.black, width: 2.0)
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      foregroundColor: Colors.black,
+                      elevation: 5,
+                    ),
+                    child: const Text(
+                      'Borrow',
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentReport()))
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentReport()));
                     },
-                    icon: const Icon(Icons.report_problem_outlined),
-                    label: const Text('Report'),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      foregroundColor: Theme.of(context).colorScheme.secondary,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey.shade100,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                          side: const BorderSide(color: Colors.black, width: 2.0)
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      foregroundColor: Colors.black,
+                      elevation: 5,
+                    ),
+                    child: const Text(
+                      'Report',
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold
+                      ),
                     ),
                   ),
                 ),
@@ -230,10 +290,10 @@ class _StudentDashboardState extends State<StudentDashboard> {
     return isBackground ? Colors.white : Colors.transparent;
   }
 
-  Widget _buildCurrentlyBorrowedCard({required BuildContext context, required String courseCode, required int itemCount, required int daysLeft}) {
+  Widget _buildCurrentlyBorrowedCard({required BuildContext context, required BorrowTransaction transaction, required int itemCount, required int daysLeft}) {
     final Color borderColor = _getCardColor(daysLeft, isBackground: false);
     final Color backgroundColor = _getCardColor(daysLeft, isBackground: true);
-    final double borderWidth = (daysLeft <= 0) ? 2.0 : 0.0;
+    final Color effectiveBorderColor = (daysLeft > 0) ? Colors.blue.shade800 : borderColor;
     final Color daysLeftTextColor = (daysLeft < 0) ? Colors.red.shade600 : (daysLeft == 0 ? Colors.orange.shade600 : Colors.blue.shade900);
 
     return Card(
@@ -241,8 +301,8 @@ class _StudentDashboardState extends State<StudentDashboard> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0),
         side: BorderSide(
-          color: borderColor,
-          width: borderWidth,
+          color: effectiveBorderColor,
+          width: 2.0,
         ),
       ),
       shadowColor: Theme.of(context).shadowColor,
@@ -251,8 +311,12 @@ class _StudentDashboardState extends State<StudentDashboard> {
         borderRadius: BorderRadius.circular(20.0),
         child: InkWell(
           onTap: () {
-            print('Borrowed Item Card for $courseCode clicked!');
-            /* TODO: Navigate to the details screen for this item */
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => StudentTransaction(transaction: transaction, daysLeft: daysLeft),
+              ),
+            );
           },
           borderRadius: BorderRadius.circular(20.0),
           child: Padding(
@@ -263,7 +327,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
               MainAxisSize.min,
               children: [
                 Text(
-                  courseCode,
+                  transaction.courseCode,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: daysLeftTextColor),
                   textAlign: TextAlign.center,
                 ),
@@ -272,11 +336,11 @@ class _StudentDashboardState extends State<StudentDashboard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '$daysLeft days left',
-                      style: Theme.of(context).textTheme.bodyMedium
+                        '$daysLeft days left',
+                        style: Theme.of(context).textTheme.bodyMedium
                     ),
                     Text(
-                      '$itemCount items',
+                      '$itemCount${itemCount == 1 ? ' item' : ' items'}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -370,10 +434,14 @@ class _StudentDashboardState extends State<StudentDashboard> {
   }
 
   Color _getStatusColor(String status, BuildContext context) {
-    if (status.toUpperCase() == 'PICK-UP') {
+    final upperStatus = status.toUpperCase();
+
+    if (upperStatus == 'PICK-UP' || upperStatus == 'COMPLETE') {
       return Colors.green.shade700;
-    } else if (status.contains('#')) {
+    } else if (upperStatus == 'PARTIAL') {
       return Colors.orange.shade800;
+    } else if (upperStatus.contains('#')) {
+      return Colors.red.shade800;
     }
     return Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black;
   }
