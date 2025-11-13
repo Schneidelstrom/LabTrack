@@ -4,6 +4,8 @@ import 'package:labtrack/student/screens/report.dart';
 import 'package:labtrack/student/reusables.dart';
 import 'package:labtrack/student/screens/waitlist.dart';
 import 'package:labtrack/student/screens/return.dart';
+import 'package:labtrack/student/screens/request.dart';
+import 'package:labtrack/student/screens/reported.dart';
 
 class StudentDashboard extends StatefulWidget {
   const StudentDashboard({super.key});
@@ -15,17 +17,16 @@ class StudentDashboard extends StatefulWidget {
 class _StudentDashboardState extends State<StudentDashboard> {
   int _currentBorrowedItemIndex = 0;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
   final List<Map<String, dynamic>> _borrowedItems = const [
     {
       'courseCode': 'BIO-101',
       'itemCount': 10,
-      'daysLeft': 9,
+      'daysLeft': -1,
     },
     {
       'courseCode': 'CHEM-103',
       'itemCount': 13,
-      'daysLeft': 12,
+      'daysLeft': 0,
     },
     {
       'courseCode': 'ECO-97',
@@ -33,6 +34,14 @@ class _StudentDashboardState extends State<StudentDashboard> {
       'daysLeft': 15,
     },
   ];
+
+  late final bool _hasPenalty;
+
+  @override
+  void initState() {
+    super.initState();
+    _hasPenalty = _borrowedItems.any((item) => item['daysLeft']! < 0);
+  }
 
   void _navigateBorrowedItems(bool isNext) {
     setState(() {
@@ -88,28 +97,27 @@ class _StudentDashboardState extends State<StudentDashboard> {
               children: [
                 Text(
                   'Welcome, Student!',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
-                TextButton.icon(
-                  onPressed: () => print("Pressed on Penalties")
+                if (_hasPenalty)
+                  TextButton.icon(
+                    onPressed: () => print("Pressed on Penalties")
                     /* TODO: Navigate to Penalties Screen */
-                  ,
-                  icon: Icon(
-                    Icons.warning_amber_rounded,
-                    size: 24.0,
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-                  label: Text(
-                    'Penalty',
-                    style: TextStyle(
-                      fontSize: 16.0,
+                    ,
+                    icon: Icon(
+                      Icons.warning_amber_rounded,
+                      size: 24.0,
                       color: Theme.of(context).colorScheme.error,
-                      fontWeight: FontWeight.bold,
+                    ),
+                    label: Text(
+                      'Penalty',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        color: Theme.of(context).colorScheme.error,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
             const SizedBox(height: 24),
@@ -154,7 +162,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                 ),
                 _buildSummaryCard(
                   context: context,
-                  title: 'Returned',
+                  title: 'Returns',
                   items: const [
                     {'name': 'BIO-2', 'status': 'COMPLETE'},
                     {'name': 'PHYSICS-94', 'status': 'PARTIAL'},
@@ -162,7 +170,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                 ),
                 _buildSummaryCard(
                   context: context,
-                  title: 'Pending Borrow',
+                  title: 'Requests',
                   items: const [
                     {'name': 'PHYSICS-105', 'status': '13x'},
                     {'name': 'ECO-34', 'status': '16x'},
@@ -170,7 +178,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                 ),
                 _buildSummaryCard(
                   context: context,
-                  title: 'Reported',
+                  title: 'Reports',
                   items: const [
                     {'name': 'Bunsen Burner', 'status': '1x'},
                     {'name': 'Thermometer', 'status': '2x'},
@@ -216,13 +224,30 @@ class _StudentDashboardState extends State<StudentDashboard> {
     );
   }
 
-  Widget _buildCurrentlyBorrowedCard({required BuildContext context, required String courseCode, required int itemCount, required int daysLeft}){
+  Color _getCardColor(int daysLeft, {required bool isBackground}) {
+    if (daysLeft < 0) return isBackground ? Colors.red.shade50 : Colors.red.shade600;
+    else if (daysLeft == 0) return isBackground ? Colors.orange.shade50 : Colors.orange.shade600;
+    return isBackground ? Colors.white : Colors.transparent;
+  }
+
+  Widget _buildCurrentlyBorrowedCard({required BuildContext context, required String courseCode, required int itemCount, required int daysLeft}) {
+    final Color borderColor = _getCardColor(daysLeft, isBackground: false);
+    final Color backgroundColor = _getCardColor(daysLeft, isBackground: true);
+    final double borderWidth = (daysLeft <= 0) ? 2.0 : 0.0;
+    final Color daysLeftTextColor = (daysLeft < 0) ? Colors.red.shade600 : (daysLeft == 0 ? Colors.orange.shade600 : Colors.blue.shade900);
+
     return Card(
       elevation: 8,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20.0),
+        side: BorderSide(
+          color: borderColor,
+          width: borderWidth,
+        ),
+      ),
       shadowColor: Theme.of(context).shadowColor,
       child: Material(
-        color: Colors.transparent,
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(20.0),
         child: InkWell(
           onTap: () {
@@ -239,7 +264,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
               children: [
                 Text(
                   courseCode,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: Colors.blue.shade900),
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: daysLeftTextColor),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
@@ -248,7 +273,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                   children: [
                     Text(
                       '$daysLeft days left',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                      style: Theme.of(context).textTheme.bodyMedium
                     ),
                     Text(
                       '$itemCount items',
@@ -287,8 +312,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
         child: InkWell(
           onTap: () {
             if (title == 'Waitlist') Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentWaitlist()));
-            else if (title == 'Returned') Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentReturn()));
-            print('Tapped on the $title summary card!');
+            else if (title == 'Returns') Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentReturn()));
+            else if (title == 'Requests') Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentRequest()));
+            else if (title == 'Reports') Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentReported()));
           },
           borderRadius: BorderRadius.circular(20.0),
           child: Padding(

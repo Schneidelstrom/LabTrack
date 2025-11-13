@@ -112,6 +112,14 @@ class _WaitlistCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Flexible(
+                  child: Text(
+                    item.name,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    textAlign: TextAlign.left,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
@@ -124,17 +132,6 @@ class _WaitlistCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                       color: Colors.blue.shade900,
-                    ),
-                  ),
-                ),
-                Flexible(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Text(
-                      item.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                      textAlign: TextAlign.right,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
@@ -156,76 +153,73 @@ class _WaitlistCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
+
             SizedBox(
               width: double.infinity,
-                child: isReady ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+              child: isReady
+                  ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   const Text(
-                  'Pickup Deadline:',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                    fontWeight: FontWeight.normal,
+                    'Pickup Deadline:',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(Icons.access_time_filled, color: Colors.red.shade800, size: 20),
-                    const SizedBox(width: 8),
-                    Text(
-                      pickupTime,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.red.shade800,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(Icons.calendar_month, color: Colors.blue.shade800, size: 20),
-                    const SizedBox(width: 8),
-                    Text(
-                      pickupDate,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.blue.shade800,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                    OutlinedButton(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Cancelling Pickup reservation for ${item.name}')),
-                          );
-                        },
-                        style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.red.shade700,
-                            side: BorderSide(color: Colors.red.shade200)
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.access_time_filled, color: Colors.red.shade800, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        pickupTime,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.red.shade800,
+                          fontWeight: FontWeight.bold,
                         ),
-                        child: const Text('Cancel Reservation')
-                    ),
-                  ],
-                )
-                    : OutlinedButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Cancelling reservation for ${item.name}')),
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.red.shade700,
-                        side: BorderSide(color: Colors.red.shade200)
-                    ),
-                    child: const Text('Cancel Reservation')
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.calendar_month, color: Colors.blue.shade800, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        pickupDate,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.blue.shade800,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 24),
+                ],
+              )
+                  : const SizedBox(),
+            ),
+            const Divider(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.cancel_outlined),
+                label: const Text("Cancel Reservation"),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Cancel Reservation for ${item.name}')),
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.red.shade700,
+                  side: BorderSide(color: Colors.red.shade200),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
+              ),
             ),
           ],
         ),
