@@ -2,39 +2,70 @@ import 'package:flutter/material.dart';
 
 Drawer buildAppDrawer(BuildContext context, {required int selectedIndex}) {
   const Color primaryBlue = Color(0xFF0D47A1);
+  const Color placeholderGrey = Color(0xFF9E9E9E);
 
-  void handleNavigation(int index) {
-    Navigator.of(context).pop();
-    switch (index) {
-      case 0:
-        print("Tapped on Inventory");
-        break;
-    }
+  Widget buildUnderDevelopmentItem({
+    required IconData icon,
+    required String title,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Opacity(
+        opacity: 0.6,
+        child: Row(
+          children: <Widget>[
+            Icon(
+              icon,
+              color: placeholderGrey,
+              size: 24,
+            ),
+            const SizedBox(width: 32),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: placeholderGrey,
+                    fontSize: 16,
+                  ),
+                ),
+                const Text(
+                  'Feature Under Development',
+                  style: TextStyle(
+                    color: placeholderGrey,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   return Drawer(
     child: ListView(
       padding: EdgeInsets.zero,
       children: <Widget>[
-        DrawerHeader(
+        const DrawerHeader(
           decoration: BoxDecoration(
-            color: Colors.blue.shade900,
+            color: primaryBlue,
           ),
-          child: const Center(
-            child: Text(
-              'Menu',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+          child: Text(
+            'Menu',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
             ),
           ),
         ),
-        ListTile(
-          leading: const Icon(Icons.inventory_2_rounded, color: primaryBlue),
-          title: const Text('Inventory'),
-          onTap: () => handleNavigation(0),
+        buildUnderDevelopmentItem(
+          icon: Icons.info,
+          title: 'About',
         ),
       ],
     ),
@@ -45,10 +76,10 @@ PopupMenuButton<String> buildProfilePopupMenuButton(BuildContext context) {
   void handleSelection(String result) {
     switch (result) {
       case 'Profile':
-        print("Popup: Navigate to Profile Screen");
+        print("Under Development");
         break;
       case 'Settings':
-        print("Popup: Navigate to Settings Screen");
+        print("Under Development");
         break;
       case 'Logout':
         _showLogoutConfirmationDialog(context);

@@ -1,3 +1,5 @@
+// lib/student/screens/dashboard.dart
+
 import 'package:flutter/material.dart';
 import 'package:labtrack/student/screens/borrow.dart';
 import 'package:labtrack/student/screens/report.dart';
@@ -41,7 +43,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
       courseName: 'Organic Chemistry',
       borrowerName: 'Alice Johnson',
       dateBorrowed: '2025-11-01',
-      deadlineDate: '2025-11-13',
+      deadlineDate: '2025-11-15',
       groupMembers: const ['Alice Johnson', 'Bob Brown'],
       borrowedItems: const [
         const {'name': 'Test Tube Rack', 'quantity': 1},
@@ -235,7 +237,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey.shade100,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
+                          borderRadius: BorderRadius.circular(10.0),
                           side: const BorderSide(color: Colors.black, width: 2.0)
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 20),
@@ -260,7 +262,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey.shade100,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
+                          borderRadius: BorderRadius.circular(10.0),
                           side: const BorderSide(color: Colors.black, width: 2.0)
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 20),
@@ -310,14 +312,30 @@ class _StudentDashboardState extends State<StudentDashboard> {
         color: backgroundColor,
         borderRadius: BorderRadius.circular(20.0),
         child: InkWell(
-          onTap: () {
-            Navigator.push(
+          // =================== KEY CHANGE ===================
+          // 1. Make the onTap function async
+          onTap: () async {
+            // 2. Use await to wait for the Navigator.push to complete
+            final newIndex = await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => StudentTransaction(transaction: transaction, daysLeft: daysLeft),
+                // 3. Use the new StudentTransactionViewer
+                builder: (context) => StudentTransactionViewer(transactions: _borrowedItems, initialIndex: _currentBorrowedItemIndex),
               ),
             );
+
+            // 6. When the screen is popped, it returns the newIndex
+            //    Check if it's not null and is an integer
+            if (newIndex != null && newIndex is int) {
+              // 7. If the index is different, update the state to sync the dashboard
+              if (newIndex != _currentBorrowedItemIndex) {
+                setState(() {
+                  _currentBorrowedItemIndex = newIndex;
+                });
+              }
+            }
           },
+          // ================= END KEY CHANGE =================
           borderRadius: BorderRadius.circular(20.0),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
