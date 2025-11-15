@@ -117,21 +117,35 @@ class DashboardController {
   void navigateToPenalty(BuildContext context) {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PenaltyView()));
   }
+
   void navigateToWaitlist(BuildContext context) {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WaitlistView()));
   }
+
   void navigateToReturns(BuildContext context) {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ReturnView()));
   }
+
   void navigateToRequests(BuildContext context) {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => const RequestView()));
   }
+
   void navigateToReportedItems(BuildContext context) {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ReportedItemsView()));
   }
+
   void navigateToBorrow(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const BorrowView()));
+    if (currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("User data not loaded. Please wait."))
+      );
+      return;
+    }
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => BorrowView(currentUser: currentUser!),
+    ));
   }
+
   void navigateToReport(BuildContext context) {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ReportView()));
   }

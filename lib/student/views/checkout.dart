@@ -6,12 +6,14 @@ import 'package:labtrack/student/models/user.dart';
 
 /// For displaying the cart, managing group members, selecting a course, and confirming the borrow request
 class CheckoutView extends StatefulWidget {
+  final UserModel currentUser;
   final Set<String> selectedItems;
   final Set<UserModel> initialGroupMembers;
   final Course? initialCourse;
 
   const CheckoutView({
     super.key,
+    required this.currentUser,
     required this.selectedItems,
     required this.initialGroupMembers,
     this.initialCourse,
@@ -28,6 +30,7 @@ class _CheckoutViewState extends State<CheckoutView> {
   void initState() {
     super.initState();
     _controller = CheckoutController(
+      currentUser: widget.currentUser,
       selectedItemNames: widget.selectedItems,
       initialGroupMembers: widget.initialGroupMembers,
       initialCourse: widget.initialCourse,

@@ -9,6 +9,7 @@ import 'package:labtrack/student/main_screen.dart';
 /// Managing the cart, group members, course selection, and the final checkout process for the [CheckoutView]
 class CheckoutController {
   late List<CartItem> _cartItems;
+  final UserModel currentUser;
   final Set<UserModel> _groupMembers;
   Course? _selectedCourse;
   List<Course> _allCourses = [];
@@ -17,7 +18,7 @@ class CheckoutController {
   Set<UserModel> get groupMembers => _groupMembers;
   Course? get selectedCourse => _selectedCourse;
   List<Course> get allCourses => _allCourses;
-  CheckoutController({required Set<String> selectedItemNames, required Set<UserModel> initialGroupMembers, Course? initialCourse,}) :_cartItems = selectedItemNames.map((name) => CartItem(name: name)).toList(), _groupMembers = initialGroupMembers, _selectedCourse = initialCourse; // Initialize state from data passed by [BorrowView]
+  CheckoutController({required this.currentUser, required Set<String> selectedItemNames, required Set<UserModel> initialGroupMembers, Course? initialCourse,}) :_cartItems = selectedItemNames.map((name) => CartItem(name: name)).toList(), _groupMembers = initialGroupMembers, _selectedCourse = initialCourse; // Initialize state from data passed by [BorrowView]
 
   Future<void> loadInitialData() async {
     final jsonStrings = await Future.wait([
@@ -69,6 +70,7 @@ class CheckoutController {
     final lowerCasePattern = pattern.toLowerCase();
 
     return _allUsers.where((user) {
+      if (user.upMail == currentUser.upMail) return false;
       // Exclude students who are already in the group
       final isAlreadyAdded = _groupMembers.any((member) => member.upMail == user.upMail);
       if (isAlreadyAdded) return false;

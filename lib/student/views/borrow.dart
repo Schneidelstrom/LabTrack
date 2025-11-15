@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:labtrack/student/controllers/borrow.dart';
 import 'package:labtrack/student/models/lab_item.dart';
+import 'package:labtrack/student/models/user.dart';
 import 'package:labtrack/student/widgets/app_bar.dart';
 import 'package:labtrack/student/widgets/drawer.dart';
 
 class BorrowView extends StatefulWidget {
-  const BorrowView({super.key});
+  final UserModel currentUser;
+  const BorrowView({super.key, required this.currentUser});
 
   @override
   State<BorrowView> createState() => _BorrowViewState();
 }
 class _BorrowViewState extends State<BorrowView> {
-  final BorrowController _controller = BorrowController();
-  late Future<void> _itemsFuture;
+  late final BorrowController _controller;
 
   @override
   void initState() {
     super.initState();
-    _itemsFuture = _controller.loadItems();
+    _controller = BorrowController(currentUser: widget.currentUser);
+    _controller.loadItems();
   }
 
   void _toggleItemSelection(LabItem item) {
@@ -43,7 +45,7 @@ class _BorrowViewState extends State<BorrowView> {
             const _SearchBar(),
             Expanded(
               child: FutureBuilder<void>(
-                future: _itemsFuture,
+                future: _controller.loadItems(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
                   if (snapshot.hasError) return Center(child: Text('Error: ${snapshot.error}'));

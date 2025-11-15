@@ -10,11 +10,14 @@ import 'package:labtrack/student/views/checkout.dart';
 class BorrowController {
   List<LabItem> _items = [];
   final Set<String> _selectedItemNames = {};
+  final UserModel currentUser;
   Set<UserModel> _retainedGroupMembers = {};
   Course? _retainedCourse;
   List<LabItem> get items => _items;
   int get selectedItemCount => _selectedItemNames.length;
   bool isSelected(LabItem item) => _selectedItemNames.contains(item.name);
+
+  BorrowController({required this.currentUser});
 
   Future<void> loadItems() async {
     final String jsonString = await rootBundle.loadString('lib/database/lab_items.json');
@@ -50,7 +53,7 @@ class BorrowController {
   Future<void> navigateToCheckout(BuildContext context) async {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => CheckoutView(selectedItems: _selectedItemNames, initialGroupMembers: _retainedGroupMembers, initialCourse: _retainedCourse,),
+        builder: (context) => CheckoutView(currentUser: currentUser, selectedItems: _selectedItemNames, initialGroupMembers: _retainedGroupMembers, initialCourse: _retainedCourse,),
       ),
     );
     // Update the retained state
