@@ -1,0 +1,59 @@
+{
+  "users": [
+    {
+      "upmail": "jdelacruz@up.edu.ph",
+      "fname": "Juan",
+      "mname": "Reyes",
+      "lname": "Dela Cruz",
+      "sid": "2021-00001",
+      "dprogram": "BS Computer Science",
+      "ylevel": 4,
+      "cnumber": "09171234567",
+      "role": "student"
+    },
+    {
+      "upmail": "asmith@up.edu.ph",
+      "fname": "Alice",
+      "mname": null,
+      "lname": "Smith",
+      "sid": "2022-00002",
+      "dprogram": "BS Biology",
+      "ylevel": 3,
+      "cnumber": "09182345678",
+      "role": "student"
+    },
+    {
+      "upmail": "m.garcia@up.edu.ph",
+      "fname": "Maria",
+      "mname": "Santos",
+      "lname": "Garcia",
+      "sid": "2020-00003",
+      "dprogram": "BS Chemistry",
+      "ylevel": 5,
+      "cnumber": "09193456789",
+      "role": "student"
+    },
+    {
+      "upmail": "student@up.edu.ph",
+      "fname": "Jade Eric",
+      "mname": "Indic",
+      "lname": "Petilla",
+      "sid": "2023-05021",
+      "dprogram": "BS Computer Science",
+      "ylevel": 3,
+      "cnumber": "09124569511",
+      "role": "student"
+    },
+    {
+      "upmail": "profdavis@up.edu.ph",
+      "fname": "Robert",
+      "mname": "Lee",
+      "lname": "Davis",
+      "sid": "N/A",
+      "dprogram": "College of Science",
+      "ylevel": 0,
+      "cnumber": "09204567890",
+      "role": "staff"
+    }
+  ]
+}

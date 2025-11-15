@@ -1,0 +1,34 @@
+{
+"waitlist_items": [
+{
+"name": "Digital Scale",
+"courseCode": "PHYS-103",
+"statusMessage": "#1",
+"status": "in_queue"
+},
+{
+"name": "Microscope",
+"courseCode": "BIO-107",
+"statusMessage": "PICK-UP",
+"status": "ready_for_pickup"
+},
+{
+"name": "Digital Scale",
+"courseCode": "CHEM-102",
+"statusMessage": "#2",
+"status": "in_queue"
+},
+{
+"name": "Hot Plate",
+"courseCode": "BIOCHEM-111",
+"statusMessage": "PICK-UP",
+"status": "ready_for_pickup"
+},
+{
+"name": "Safety Goggles",
+"courseCode": "CHEM-102",
+"statusMessage": "#5",
+"status": "in_queue"
+}
+]
+}

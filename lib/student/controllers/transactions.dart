@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:flutter/services.dart';
+
 /// Presentation-layer model to unify different transaction types for display
 class DisplayTransaction {
   final String courseCode;
@@ -18,32 +21,41 @@ class TransactionsController {
   List<DisplayTransaction> get transactions => _transactions;
 
   Future<void> loadTransactions() async {
-    await Future.delayed(const Duration(milliseconds: 400));
-    _transactions = const [
-      DisplayTransaction(
-        courseCode: 'CHEM-89',
-        status: 'COMPLETE',
-        date: '09-08-2025',
-        type: 'Return',
-      ),
-      DisplayTransaction(
-        courseCode: 'CHEM-87',
-        status: '13 Items',
-        date: '09-01-2025',
-        type: 'Borrow',
-      ),
-      DisplayTransaction(
-        courseCode: 'BIO-101',
-        status: 'PARTIAL',
-        date: '08-25-2025',
-        type: 'Return',
-      ),
-      DisplayTransaction(
-        courseCode: 'PHYS-99',
-        status: '7 Items',
-        date: '08-22-2025',
-        type: 'Borrow',
-      ),
-    ];
+    final results = await Future.wait([
+      rootBundle.loadString('lib/database/borrow_transactions.json'),
+      rootBundle.loadString('lib/database/return_items.json'),
+    ]);
+    final List<DisplayTransaction> consolidatedList = [];
+
+    final borrowJson = json.decode(results[0]);
+    final List<dynamic> borrowList = borrowJson['borrow_transactions'];
+    for (var tx in borrowList) {
+      final int itemCount = (tx['borrowedItems'] as List).length;
+      consolidatedList.add(
+        DisplayTransaction(
+          courseCode: tx['courseCode'],
+          status: '$itemCount ${itemCount == 1 ? "Item" : "Items"}',
+          date: tx['dateBorrowed'],
+          type: 'Borrow',
+        ),
+      );
+    }
+
+    final returnJson = json.decode(results[1]);
+    final List<dynamic> returnList = returnJson['return_items'];
+    for (var item in returnList) {
+      final status = (item['returnedQuantity'] as int) >= (item['quantity'] as int) ? 'COMPLETE' : 'PARTIAL';
+      consolidatedList.add(
+        DisplayTransaction(
+          courseCode: item['courseCode'],
+          status: status,
+          date: item['returnDate'],
+          type: 'Return',
+        ),
+      );
+    }
+
+    consolidatedList.sort((a, b) => b.date.compareTo(a.date));
+    _transactions = consolidatedList;
   }
 }

@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:labtrack/student/controllers/checkout.dart';
 import 'package:labtrack/student/models/cart_item.dart';
 import 'package:labtrack/student/models/course.dart';
-import 'package:labtrack/student/models/group_member.dart';
+import 'package:labtrack/student/models/user.dart';
 
 /// For displaying the cart, managing group members, selecting a course, and confirming the borrow request
 class CheckoutView extends StatefulWidget {
   final Set<String> selectedItems;
-  final Set<GroupMember> initialGroupMembers;
+  final Set<UserModel> initialGroupMembers;
   final Course? initialCourse;
 
   const CheckoutView({
@@ -87,8 +87,8 @@ class _GroupMemberSearch extends StatelessWidget {
       children: [
         const Text('Group Members', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
         const SizedBox(height: 8),
-        Autocomplete<GroupMember>(
-          displayStringForOption: (option) => option.name,
+        Autocomplete<UserModel>(
+          displayStringForOption: (option) => option.fullName,
           optionsBuilder: (textEditingValue) => controller.searchGroupMembers(textEditingValue.text),
           onSelected: (selection) {
             controller.addGroupMember(selection);
@@ -114,7 +114,7 @@ class _GroupMemberSearch extends StatelessWidget {
             runSpacing: 4.0,
             children: controller.groupMembers.map((member) {
               return Chip(
-                label: Text(member.name),
+                label: Text(member.firstName),
                 deleteIcon: const Icon(Icons.cancel, size: 18),
                 onDeleted: () {
                   controller.removeGroupMember(member);

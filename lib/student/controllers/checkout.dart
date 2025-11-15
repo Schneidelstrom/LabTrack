@@ -1,51 +1,61 @@
+import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:labtrack/student/models/cart_item.dart';
 import 'package:labtrack/student/models/course.dart';
-import 'package:labtrack/student/models/group_member.dart';
+import 'package:labtrack/student/models/user.dart';
 import 'package:labtrack/student/main_screen.dart';
 
 /// Managing the cart, group members, course selection, and the final checkout process for the [CheckoutView]
 class CheckoutController {
   late List<CartItem> _cartItems;
-  final Set<GroupMember> _groupMembers;
+  final Set<UserModel> _groupMembers;
   Course? _selectedCourse;
   List<Course> _allCourses = [];
-  List<GroupMember> _allStudents = [];
+  List<UserModel> _allUsers = [];
   List<CartItem> get cartItems => _cartItems;
-  Set<GroupMember> get groupMembers => _groupMembers;
+  Set<UserModel> get groupMembers => _groupMembers;
   Course? get selectedCourse => _selectedCourse;
   List<Course> get allCourses => _allCourses;
-  CheckoutController({required Set<String> selectedItemNames, required Set<GroupMember> initialGroupMembers, Course? initialCourse,}) :_cartItems = selectedItemNames.map((name) => CartItem(name: name)).toList(), _groupMembers = initialGroupMembers, _selectedCourse = initialCourse; // Initialize state from data passed by [BorrowView]
+  CheckoutController({required Set<String> selectedItemNames, required Set<UserModel> initialGroupMembers, Course? initialCourse,}) :_cartItems = selectedItemNames.map((name) => CartItem(name: name)).toList(), _groupMembers = initialGroupMembers, _selectedCourse = initialCourse; // Initialize state from data passed by [BorrowView]
 
   Future<void> loadInitialData() async {
-    await Future.delayed(
-        const Duration(milliseconds: 200));
-    _allCourses = const [
-      Course(code: 'BIO-107', title: 'General Biology I'),
-      Course(code: 'CMSC-189', title: 'Introduction to Computer Science'),
-      Course(code: 'CHEM-102', title: 'General Chemistry'),
-    ];
-    _allStudents = const [
-      GroupMember(upmail: 'asmith@up.edu.ph', name: 'Alice Smith'),
-      GroupMember(upmail: 'bjohnson@up.edu.ph', name: 'Bob Johnson'),
-      GroupMember(upmail: 'cbrown@up.edu.ph', name: 'Charlie Brown'),
-    ];
-    _selectedCourse ??= _allCourses.first;
+    final jsonStrings = await Future.wait([
+      rootBundle.loadString('lib/database/courses.json'),
+      rootBundle.loadString('lib/database/users.json'),
+    ]);
+
+    final decodedCourses = json.decode(jsonStrings[0]);
+    final List<dynamic> courseListJson = decodedCourses['courses'];
+    _allCourses = courseListJson.map((jsonItem) {
+      return Course(code: jsonItem['code'], title: jsonItem['title']);
+    }).toList();
+
+    final decodedStudents = json.decode(jsonStrings[1]);
+    final List<dynamic> studentListJson = decodedStudents['users'];
+    _allUsers = studentListJson.map((jsonItem) {
+      return UserModel.fromJson(jsonItem);
+    }).toList();
+
+    if (_selectedCourse == null && _allCourses.isNotEmpty) _selectedCourse = _allCourses.first;
   }
 
   void incrementQuantity(int index) {
-    if (index < _cartItems.length) _cartItems[index].quantity++;
+    if (index < _cartItems.length) {
+      final item = _cartItems[index];
+      _cartItems[index] = CartItem(name: item.name, quantity: item.quantity + 1);
+    }
   }
 
   void decrementQuantity(int index) {
     if (index < _cartItems.length && _cartItems[index].quantity > 1) _cartItems[index].quantity--;
   }
 
-  void addGroupMember(GroupMember member) {
+  void addGroupMember(UserModel member) {
     _groupMembers.add(member);
   }
 
-  void removeGroupMember(GroupMember member) {
+  void removeGroupMember(UserModel member) {
     _groupMembers.remove(member);
   }
 
@@ -54,16 +64,16 @@ class CheckoutController {
   }
 
   /// Search for students who can be added as group members
-  Future<Iterable<GroupMember>> searchGroupMembers(String pattern) async {
+  Future<Iterable<UserModel>> searchGroupMembers(String pattern) async {
     if (pattern.isEmpty) return const Iterable.empty();
     final lowerCasePattern = pattern.toLowerCase();
 
-    return _allStudents.where((student) {
+    return _allUsers.where((user) {
       // Exclude students who are already in the group
-      final isAlreadyAdded = _groupMembers.any((member) => member.upmail == student.upmail);
+      final isAlreadyAdded = _groupMembers.any((member) => member.upMail == user.upMail);
       if (isAlreadyAdded) return false;
       // Match by name
-      return student.name.toLowerCase().contains(lowerCasePattern);}).take(5); // Limit results for performance
+      return user.fullName.toLowerCase().contains(lowerCasePattern) || user.upMail.toLowerCase().contains(lowerCasePattern);}).take(5); // Limit results for performance
   }
 
   /// Popping view and returning current state to the [BorrowView]

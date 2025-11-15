@@ -1,6 +1,8 @@
+import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:labtrack/student/models/course.dart';
-import 'package:labtrack/student/models/group_member.dart';
+import 'package:labtrack/student/models/user.dart';
 import 'package:labtrack/student/models/lab_item.dart';
 import 'package:labtrack/student/views/checkout.dart';
 
@@ -8,24 +10,24 @@ import 'package:labtrack/student/views/checkout.dart';
 class BorrowController {
   List<LabItem> _items = [];
   final Set<String> _selectedItemNames = {};
-  Set<GroupMember> _retainedGroupMembers = {};
+  Set<UserModel> _retainedGroupMembers = {};
   Course? _retainedCourse;
   List<LabItem> get items => _items;
   int get selectedItemCount => _selectedItemNames.length;
   bool isSelected(LabItem item) => _selectedItemNames.contains(item.name);
 
   Future<void> loadItems() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    _items = const [
-      LabItem(name: 'Beaker', stock: 5, category: 'Glassware'),
-      LabItem(name: 'Microscope', stock: 0, category: 'Equipment'),
-      LabItem(name: 'Bunsen Burner', stock: 8, category: 'Heating'),
-      LabItem(name: 'Test Tubes', stock: 25, category: 'Glassware'),
-      LabItem(name: 'Digital Scale', stock: 3, category: 'Measurement'),
-      LabItem(name: 'Petri Dish', stock: 50, category: 'Glassware'),
-      LabItem(name: 'Safety Goggles', stock: 12, category: 'Safety'),
-      LabItem(name: 'Graduated Cylinder', stock: 0, category: 'Measurement'),
-    ];
+    final String jsonString = await rootBundle.loadString('lib/database/lab_items.json');
+    final Map<String, dynamic> decodedJson = json.decode(jsonString);
+    final List<dynamic> itemListJson = decodedJson['lab_items'];
+
+    _items = itemListJson.map((jsonItem) {
+      return LabItem(
+        name: jsonItem['name'],
+        stock: jsonItem['stock'],
+        category: jsonItem['category'],
+      );
+    }).toList();
   }
 
   /// Selection state toggle
@@ -53,7 +55,7 @@ class BorrowController {
     );
     // Update the retained state
     if (result is Map<String, dynamic>) {
-      _retainedGroupMembers = result['groupMembers'] as Set<GroupMember>;
+      _retainedGroupMembers = result['groupMembers'] as Set<UserModel>;
       _retainedCourse = result['course'] as Course?;
     }
   }

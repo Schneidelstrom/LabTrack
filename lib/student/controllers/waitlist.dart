@@ -1,5 +1,8 @@
+import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:labtrack/student/models/waitlist_item.dart';
+
 /// Fetching user waitlisted items and handling actions for cancellation for the [WaitlistView]
 class WaitlistController {
   List<WaitlistItem> _waitlistItems = [];
@@ -7,21 +10,29 @@ class WaitlistController {
 
   /// Simulates fetching list of items the user is waitlisted for
   Future<void> loadWaitlistItems() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    _waitlistItems = const [
-      WaitlistItem(
-        name: 'Digital Scale',
-        courseCode: 'BIO-1',
-        statusMessage: 'Position: #2',
-        status: WaitlistStatus.inQueue,
-      ),
-      WaitlistItem(
-        name: 'Graduated Cylinder',
-        courseCode: 'ENVI-1',
-        statusMessage: 'Ready for Pickup',
-        status: WaitlistStatus.readyForPickup,
-      ),
-    ];
+    final String jsonString = await rootBundle.loadString('lib/database/waitlist_items.json');
+    final Map<String, dynamic> decodedJson = json.decode(jsonString);
+    final List<dynamic> waitlistListJson = decodedJson['waitlist_items'];
+
+    _waitlistItems = waitlistListJson.map((jsonItem) {
+      return WaitlistItem(
+        name: jsonItem['name'],
+        courseCode: jsonItem['courseCode'],
+        statusMessage: jsonItem['statusMessage'],
+        status: _waitlistStatusFromString(jsonItem['status']),
+      );
+    }).toList();
+  }
+
+  WaitlistStatus _waitlistStatusFromString(String status) {
+    switch (status.toLowerCase()) {
+      case 'in_queue':
+        return WaitlistStatus.inQueue;
+      case 'ready_for_pickup':
+        return WaitlistStatus.readyForPickup;
+      default:
+        return WaitlistStatus.inQueue;
+    }
   }
 
   /// When a user cancels a reservation on the waitlist.

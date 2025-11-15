@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:labtrack/student/models/penalty_item.dart';
 
@@ -7,30 +9,30 @@ class PenaltyController {
   List<Penalty> get penalties => _penalties;
 
   Future<void> loadPenalties() async {
-    await Future.delayed(const Duration(milliseconds: 400));
-    _penalties = const [
-      Penalty(
-        itemName: 'Beaker (250ml)',
-        reason: 'Overdue Return',
-        dateIncurred: '21-10-2025',
-        amount: 5.00,
-        status: PenaltyStatus.unresolved,
-      ),
-      Penalty(
-        itemName: 'Microscope',
-        reason: 'Damaged Item',
-        dateIncurred: '15-10-2025',
-        amount: 50.00,
-        status: PenaltyStatus.unresolved,
-      ),
-      Penalty(
-        itemName: 'Bunsen Burner',
-        reason: 'Overdue Return',
-        dateIncurred: '05-10-2025',
-        amount: 15.00,
-        status: PenaltyStatus.resolved,
-      ),
-    ];
+    final String jsonString = await rootBundle.loadString('lib/database/penalties.json');
+    final Map<String, dynamic> decodedJson = json.decode(jsonString);
+    final List<dynamic> penaltyListJson = decodedJson['penalties'];
+
+    _penalties = penaltyListJson.map((jsonItem) {
+      return Penalty(
+        itemName: jsonItem['itemName'],
+        reason: jsonItem['reason'],
+        dateIncurred: jsonItem['dateIncurred'],
+        amount: (jsonItem['amount'] as num).toDouble(),
+        status: _penaltyStatusFromString(jsonItem['status']),
+      );
+    }).toList();
+  }
+
+  PenaltyStatus _penaltyStatusFromString(String status) {
+    switch (status.toLowerCase()) {
+      case 'resolved':
+        return PenaltyStatus.resolved;
+      case 'unresolved':
+        return PenaltyStatus.unresolved;
+      default:
+        return PenaltyStatus.unresolved;
+    }
   }
 
   void handlePayNow(BuildContext context, Penalty penalty) {

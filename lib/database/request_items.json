@@ -1,0 +1,29 @@
+{
+"request_items": [
+{
+"courseCode": "PHYS-103",
+"itemCount": 5,
+"requestDate": "2025-11-12"
+},
+{
+"courseCode": "CHEM-102",
+"itemCount": 15,
+"requestDate": "2025-11-11"
+},
+{
+"courseCode": "BIO-107",
+"itemCount": 8,
+"requestDate": "2025-11-10"
+},
+{
+"courseCode": "ENVI-SCI-100",
+"itemCount": 3,
+"requestDate": "2025-11-09"
+},
+{
+"courseCode": "BIOCHEM-111",
+"itemCount": 12,
+"requestDate": "2025-11-08"
+}
+]
+}

@@ -1,0 +1,91 @@
+{
+"borrow_transactions": [
+{
+"transactionId": "TXN-2025-001",
+"courseCode": "BIO-107",
+"courseName": "General Biology I",
+"borrowerName": "Alice Smith",
+"dateBorrowed": "2025-11-10",
+"deadlineDate": "2025-11-12",
+"groupMembers": ["Alice Smith", "Bob Johnson"],
+"borrowedItems": [
+{
+"name": "Microscope",
+"quantity": 2
+},
+{
+"name": "Petri Dish",
+"quantity": 10
+}
+]
+},
+{
+"transactionId": "TXN-2025-002",
+"courseCode": "CHEM-102",
+"courseName": "General Chemistry I",
+"borrowerName": "Juan Dela Cruz",
+"dateBorrowed": "2025-11-13",
+"deadlineDate": "2025-11-15",
+"groupMembers": ["Juan Dela Cruz", "Maria Garcia", "Li Chen"],
+"borrowedItems": [
+{
+"name": "Beaker (250ml)",
+"quantity": 5
+},
+{
+"name": "Test Tubes",
+"quantity": 20
+},
+{
+"name": "Safety Goggles",
+"quantity": 3
+}
+]
+},
+{
+"transactionId": "TXN-2025-003",
+"courseCode": "PHYS-103",
+"courseName": "College Physics I",
+"borrowerName": "Sofia Santos",
+"dateBorrowed": "2025-11-14",
+"deadlineDate": "2025-11-21",
+"groupMembers": ["Sofia Santos", "David Williams"],
+"borrowedItems": [
+{
+"name": "Hot Plate",
+"quantity": 1
+}
+]
+},
+{
+"transactionId": "TXN-2025-004",
+"courseCode": "BIOCHEM-111",
+"courseName": "Fundamentals of Biochemistry",
+"borrowerName": "Li Chen",
+"dateBorrowed": "2025-11-05",
+"deadlineDate": "2025-12-05",
+"groupMembers": ["Li Chen"],
+"borrowedItems": [
+{
+"name": "Graduated Cylinder (100ml)",
+"quantity": 3
+}
+]
+},
+{
+"transactionId": "TXN-2025-005",
+"courseCode": "CHEM-102",
+"courseName": "General Chemistry I",
+"borrowerName": "Bob Johnson",
+"dateBorrowed": "2025-11-01",
+"deadlineDate": "2025-11-08",
+"groupMembers": ["Bob Johnson", "Alice Smith"],
+"borrowedItems": [
+{
+"name": "Bunsen Burner",
+"quantity": 2
+}
+]
+}
+]
+}

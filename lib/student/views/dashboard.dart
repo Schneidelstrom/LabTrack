@@ -65,7 +65,8 @@ class _DashboardViewState extends State<DashboardView> {
   }
 
   Widget _buildWelcomeHeader() {
-    return Text('Welcome, Student!', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),);
+    final String welcomeMessage = _controller.currentUser != null ? 'Welcome, ${_controller.currentUser!.firstName}!' : 'Welcome, User!';
+    return Text(welcomeMessage, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),);
   }
 
   Widget _buildPenaltyButton() {

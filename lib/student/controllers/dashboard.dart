@@ -1,6 +1,10 @@
+import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:labtrack/student/models/borrow_transaction.dart';
 import 'package:labtrack/student/models/cart_item.dart';
+import 'package:labtrack/student/models/user.dart';
+import 'package:labtrack/student/auth.dart';
 import 'package:labtrack/student/views/borrow.dart';
 import 'package:labtrack/student/views/penalty.dart';
 import 'package:labtrack/student/views/report.dart';
@@ -27,55 +31,53 @@ class DashboardController {
   List<Map<String, String>> get returnsSummary => _returnsSummary;
   List<Map<String, String>> get requestsSummary => _requestsSummary;
   List<Map<String, String>> get reportsSummary => _reportsSummary;
+  final AuthService _authService = AuthService();
+  UserModel? currentUser;
 
   Future<void> loadData() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    _borrowedItems = [
-      BorrowTransaction(
-        transactionId: 'TXN-00123',
-        courseCode: 'BIO-101',
-        courseName: 'General Biology',
-        borrowerName: 'John Doe',
-        dateBorrowed: '2025-11-10',
-        deadlineDate: '2025-11-12',
-        groupMembers: ['John Doe', 'Jane Smith'],
-        borrowedItems: [
-          CartItem(name: 'Microscope', quantity: 5),
-          CartItem(name: 'Slide Set', quantity: 5),
-        ],
-      ),
-      BorrowTransaction(
-        transactionId: 'TXN-00124',
-        courseCode: 'CHEM-103',
-        courseName: 'Organic Chemistry',
-        borrowerName: 'Alice Johnson',
-        dateBorrowed: '2025-11-01',
-        deadlineDate: '2025-11-25',
-        groupMembers: ['Alice Johnson', 'Bob Brown'],
-        borrowedItems: [
-          CartItem(name: 'Test Tube Rack', quantity: 1),
-          CartItem(name: 'Safety Goggles', quantity: 12),
-        ],
-      ),
-    ];
+    currentUser = await _authService.getCurrentUserDetails();
+    final results = await Future.wait([
+      rootBundle.loadString('lib/database/borrow_transactions.json'),
+      rootBundle.loadString('lib/database/waitlist_items.json'),
+      rootBundle.loadString('lib/database/return_items.json'),
+      rootBundle.loadString('lib/database/request_items.json'),
+      rootBundle.loadString('lib/database/reported_items.json'),
+      rootBundle.loadString('lib/database/penalties.json'),
+    ]);
+    final borrowTxJson = json.decode(results[0]);
+    final List<dynamic> borrowTxList = borrowTxJson['borrow_transactions'];
 
-    _waitlistSummary = const [
-      {'name': 'BIO-1', 'status': '#2'},
-      {'name': 'ENVI-1', 'status': 'PICK-UP'},
-    ];
-    _returnsSummary = const [
-      {'name': 'BIO-2', 'status': 'COMPLETE'},
-      {'name': 'PHYSICS-94', 'status': 'PARTIAL'},
-    ];
-    _requestsSummary = const [
-      {'name': 'PHYSICS-105', 'status': '13x'},
-      {'name': 'ECO-34', 'status': '16x'},
-    ];
-    _reportsSummary = const [
-      {'name': 'Bunsen Burner', 'status': '1x'},
-    ];
+    _borrowedItems = borrowTxList.map((tx) {
+      final List<dynamic> itemsJson = tx['borrowedItems'];
+      return BorrowTransaction(
+        transactionId: tx['transactionId'],
+        courseCode: tx['courseCode'],
+        courseName: tx['courseName'],
+        borrowerName: tx['borrowerName'],
+        dateBorrowed: tx['dateBorrowed'],
+        deadlineDate: tx['deadlineDate'],
+        groupMembers: List<String>.from(tx['groupMembers']),
+        borrowedItems: itemsJson.map((item) => CartItem(name: item['name'], quantity: item['quantity'])).toList(),
+      );
+    }).toList();
 
-    _hasPenalty = _borrowedItems.any((item) => calculateDaysLeft(item.deadlineDate) < 0);
+    final waitlistJson = json.decode(results[1]);
+    _waitlistSummary = (waitlistJson['waitlist_items'] as List<dynamic>).map((item) => <String, String>{'name': item['courseCode'], 'status': item['statusMessage']}).toList();
+
+    final returnsJson = json.decode(results[2]);
+    _returnsSummary = (returnsJson['return_items'] as List<dynamic>).map((item) {
+      final status = (item['returnedQuantity'] as int) >= (item['quantity'] as int) ? 'COMPLETE' : 'PARTIAL';
+      return <String, String>{'name': item['courseCode'], 'status': status};
+    }).toList();
+
+    final requestsJson = json.decode(results[3]);
+    _requestsSummary = (requestsJson['request_items'] as List<dynamic>).map((item) => <String, String>{'name': item['courseCode'], 'status': '${item['itemCount']}x'}).toList();
+
+    final reportsJson = json.decode(results[4]);
+    _reportsSummary = (reportsJson['reported_items'] as List<dynamic>).map((item) => <String, String>{'name': item['itemName'], 'status': '1x'}).toList();
+
+    final penaltiesJson = json.decode(results[5]);
+    _hasPenalty = (penaltiesJson['penalties'] as List<dynamic>).any((p) => p['status'] == 'unresolved');
   }
 
   /// Method to calculate days left until deadline

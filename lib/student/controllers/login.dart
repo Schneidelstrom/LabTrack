@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-
 typedef LoadingCallback = void Function(bool isLoading); // For updating loading state in view
 
 /// User authentication with Firebase, input validation, and showing feedback to user for the [LoginView]

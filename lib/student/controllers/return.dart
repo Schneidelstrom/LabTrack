@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:labtrack/student/models/return_item.dart';
 
@@ -7,37 +9,19 @@ class ReturnController {
   List<ReturnItem> get returnItems => _returnItems;
 
   Future<void> loadReturnItems() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    _returnItems = const [
-      ReturnItem(
-        courseCode: 'CS101',
-        quantity: 5,
-        returnedQuantity: 5,
-        borrowDate: '15-01-2025',
-        returnDate: '20-01-2025',
-      ),
-      ReturnItem(
-        courseCode: 'PHYS205',
-        quantity: 10,
-        returnedQuantity: 7,
-        borrowDate: '14-01-2025',
-        returnDate: '18-01-2025',
-      ),
-      ReturnItem(
-        courseCode: 'CHEM310',
-        quantity: 10,
-        returnedQuantity: 10,
-        borrowDate: '10-01-2025',
-        returnDate: '15-01-2025',
-      ),
-      ReturnItem(
-        courseCode: 'BIO101',
-        quantity: 2,
-        returnedQuantity: 1,
-        borrowDate: '05-01-2025',
-        returnDate: '10-01-2025',
-      ),
-    ];
+    final String jsonString = await rootBundle.loadString('lib/database/return_items.json');
+    final Map<String, dynamic> decodedJson = json.decode(jsonString);
+    final List<dynamic> returnListJson = decodedJson['return_items'];
+
+    _returnItems = returnListJson.map((jsonItem) {
+      return ReturnItem(
+        courseCode: jsonItem['courseCode'],
+        borrowDate: jsonItem['borrowDate'],
+        returnDate: jsonItem['returnDate'],
+        quantity: jsonItem['quantity'],
+        returnedQuantity: jsonItem['returnedQuantity'],
+      );
+    }).toList();
   }
 
   void viewReturnDetails(BuildContext context, ReturnItem item) {

@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:labtrack/student/models/cart_item.dart';
 
@@ -11,12 +13,23 @@ class ReportController {
   CartItem? get itemToReport => _itemToReport;
 
   Future<void> loadBorrowedItems() async {
-    await Future.delayed(const Duration(milliseconds: 250));
-    _borrowedItems = [
-      CartItem(name: 'Microscope', quantity: 1),
-      CartItem(name: 'Beaker (250ml)', quantity: 5),
-      CartItem(name: 'Digital Scale', quantity: 2),
-    ];
+    final String jsonString = await rootBundle.loadString('lib/database/borrow_transactions.json');
+    final Map<String, dynamic> decodedJson = json.decode(jsonString);
+    final List<dynamic> transactionsList = decodedJson['borrow_transactions'];
+    final Map<String, int> aggregatedItems = {};
+
+    for (var transaction in transactionsList) {
+      final List<dynamic> itemsInTransaction = transaction['borrowedItems'];
+      for (var item in itemsInTransaction) {
+        final String itemName = item['name'];
+        final int quantity = item['quantity'];
+        aggregatedItems.update(itemName, (value) => value + quantity, ifAbsent: () => quantity);
+      }
+    }
+    
+    _borrowedItems = aggregatedItems.entries.map((entry) {
+      return CartItem(name: entry.key, quantity: entry.value);
+    }).toList();
   }
 
   /// Switch view to report form for a specific item
