@@ -3,23 +3,22 @@ import 'package:labtrack/student/controllers/penalty.dart';
 import 'package:labtrack/student/models/penalty_item.dart';
 import 'package:labtrack/student/widgets/app_bar.dart';
 import 'package:labtrack/student/widgets/drawer.dart';
-/// The UI for displaying a list of student penalties.
-/// This view is responsible for rendering the list of penalties and delegating
-/// user actions to the [PenaltyController].
+
+/// For displaying a list of student penalties.
 class PenaltyView extends StatefulWidget {
   const PenaltyView({super.key});
+
   @override
   State<PenaltyView> createState() => _PenaltyViewState();
 }
+
 class _PenaltyViewState extends State<PenaltyView> {
-// The controller manages the data and business logic for this screen.
   final PenaltyController _controller = PenaltyController();
   late Future<void> _penaltiesFuture;
 
   @override
   void initState() {
     super.initState();
-// Asynchronously load the penalty data when the view is first created.
     _penaltiesFuture = _controller.loadPenalties();
   }
 
@@ -31,16 +30,8 @@ class _PenaltyViewState extends State<PenaltyView> {
       body: FutureBuilder<void>(
         future: _penaltiesFuture,
         builder: (context, snapshot) {
-// Show a loading indicator while data is being fetched.
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          // Show an error message if fetching fails.
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-
-          // If there are no penalties, display a message.
+          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+          if (snapshot.hasError) return Center(child: Text('Error: ${snapshot.error}'));
           if (_controller.penalties.isEmpty) {
             return const Center(
               child: Text(
@@ -50,7 +41,6 @@ class _PenaltyViewState extends State<PenaltyView> {
             );
           }
 
-          // Once data is loaded, build the list of penalty cards.
           return ListView.builder(
             padding: const EdgeInsets.all(16.0),
             itemCount: _controller.penalties.length,
@@ -58,7 +48,6 @@ class _PenaltyViewState extends State<PenaltyView> {
               final penalty = _controller.penalties[index];
               return _PenaltyCard(
                 item: penalty,
-                // Pass the controller's method to handle the "Pay Now" action.
                 onPayNow: () => _controller.handlePayNow(context, penalty),
               );
             },
@@ -69,17 +58,13 @@ class _PenaltyViewState extends State<PenaltyView> {
   }
 }
 
-// --- Private UI Widget ---
-/// A card widget to display the details of a single penalty.
-/// This is a stateless presentation widget.
+/// Dard widget to display the details of a single penalty
 class _PenaltyCard extends StatelessWidget {
   final Penalty item;
   final VoidCallback onPayNow;
-
   const _PenaltyCard({required this.item, required this.onPayNow});
 
-  /// Determines the display style (text and colors) based on the penalty status.
-  /// This is purely presentation logic and belongs in the view layer.
+  /// Determine display style (text and colors) based on the penalty status
   Map<String, dynamic> _getStatusStyle() {
     switch (item.status) {
       case PenaltyStatus.resolved:
@@ -101,9 +86,7 @@ class _PenaltyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statusStyle = _getStatusStyle();
-    final textTheme = Theme
-        .of(context)
-        .textTheme;
+    final textTheme = Theme.of(context).textTheme;
     return Card(
       elevation: 3,
       margin: const EdgeInsets.only(bottom: 16.0),
@@ -116,9 +99,9 @@ class _PenaltyCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(item.reason,
-                    style: textTheme.titleLarge
-                        ?.copyWith(fontWeight: FontWeight.bold)),
+                Text(
+                    item.reason,
+                    style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
                 Container(
                   padding:
                   const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -137,11 +120,15 @@ class _PenaltyCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            Text('Item: ${item.itemName}',
-                style: textTheme.bodyMedium?.copyWith(color: Colors.grey)),
+            Text(
+                'Item: ${item.itemName}',
+                style: textTheme.bodyMedium?.copyWith(color: Colors.grey)
+            ),
             const SizedBox(height: 4),
-            Text('Date Incurred: ${item.dateIncurred}',
-                style: textTheme.bodyMedium?.copyWith(color: Colors.grey)),
+            Text(
+                'Date Incurred: ${item.dateIncurred}',
+                style: textTheme.bodyMedium?.copyWith(color: Colors.grey)
+            ),
             const Divider(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -150,9 +137,7 @@ class _PenaltyCard extends StatelessWidget {
                   '₱${item.amount.toStringAsFixed(2)}',
                   style: textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: item.status == PenaltyStatus.unresolved
-                        ? Colors.red.shade700
-                        : Colors.black,
+                    color: item.status == PenaltyStatus.unresolved ? Colors.red.shade700 : Colors.black,
                   ),
                 ),
                 if (item.status == PenaltyStatus.unresolved)
@@ -165,8 +150,10 @@ class _PenaltyCard extends StatelessWidget {
                     child: const Text('Pay Now'),
                   )
                 else
-                  const Icon(Icons.check_circle,
-                      color: Colors.green, size: 28),
+                  const Icon(
+                      Icons.check_circle,
+                      color: Colors.green, size: 28
+                  ),
               ],
             ),
           ],

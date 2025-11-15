@@ -112,15 +112,7 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String labelText,
-    required String hintText,
-    required IconData prefixIcon,
-    TextInputType? keyboardType,
-    bool obscureText = false,
-    Widget? suffixIcon,
-  }) {
+  Widget _buildTextField({required TextEditingController controller, required String labelText, required String hintText, required IconData prefixIcon, TextInputType? keyboardType, bool obscureText = false, Widget? suffixIcon,}) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -139,8 +131,7 @@ class _LoginViewState extends State<LoginView> {
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0), borderSide: BorderSide.none),
           filled: true,
           fillColor: _isLoading ? Colors.grey.shade100 : Colors.white,
-          contentPadding:
-          const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+          contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
           enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0), borderSide: BorderSide.none),
           focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0), borderSide: const BorderSide(color: Colors.blueAccent, width: 2.0)),
         ),

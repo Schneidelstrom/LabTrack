@@ -1,26 +1,24 @@
-// lib/views/reported_items_view.dart
 import 'package:flutter/material.dart';
 import 'package:labtrack/student/controllers/reported.dart';
 import 'package:labtrack/student/models/report_item.dart';
 import 'package:labtrack/student/widgets/app_bar.dart';
 import 'package:labtrack/student/widgets/drawer.dart';
-/// The UI for displaying a list of items the user has reported.
-/// This view is responsible for rendering the list and delegating user actions
-/// to the [ReportedItemsController].
+
+/// For displaying a list of items the user has reported.
 class ReportedItemsView extends StatefulWidget {
   const ReportedItemsView({super.key});
+
   @override
   State<ReportedItemsView> createState() => _ReportedItemsViewState();
 }
+
 class _ReportedItemsViewState extends State<ReportedItemsView> {
-// The controller manages the data and business logic for this screen.
   final ReportedItemsController _controller = ReportedItemsController();
   late Future<void> _reportsFuture;
 
   @override
   void initState() {
     super.initState();
-// Asynchronously load the reported items data when the view is initialized.
     _reportsFuture = _controller.loadReportedItems();
   }
 
@@ -32,16 +30,9 @@ class _ReportedItemsViewState extends State<ReportedItemsView> {
       body: FutureBuilder<void>(
         future: _reportsFuture,
         builder: (context, snapshot) {
-// Show a loading indicator while data is being fetched.
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          // Show an error message if fetching fails.
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-
-          // If there are no reports, display a message.
+          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator()); // Show loading indicator while data is fetching
+          if (snapshot.hasError) return Center(child: Text('Error: ${snapshot.error}'));  // Show an error message if fetching fails
+          // If there are no reports, display a message
           if (_controller.reportedItems.isEmpty) {
             return const Center(
               child: Text(
@@ -51,7 +42,7 @@ class _ReportedItemsViewState extends State<ReportedItemsView> {
             );
           }
 
-          // Once data is loaded, build the list of report cards.
+          // Build list of report cards once data is loaded
           return ListView.builder(
             padding: const EdgeInsets.all(16.0),
             itemCount: _controller.reportedItems.length,
@@ -59,29 +50,24 @@ class _ReportedItemsViewState extends State<ReportedItemsView> {
               final report = _controller.reportedItems[index];
               return _ReportCard(
                 item: report,
-                // Pass the controller's method to handle tapping on a report.
-                onTap: () =>
-                    _controller.viewReportDetails(context, report),
+                onTap: () => _controller.viewReportDetails(context, report),
               );
             },
-          );
+          );  /// This is presentation logic and is kept within the view file.
         },
       ),
     );
   }
 }
 
-// --- Private UI Widget ---
-/// A card widget to display the details of a single reported item.
-/// This is a stateless presentation widget.
+/// Card widget to display the details of a single reported item
 class _ReportCard extends StatelessWidget {
   final ReportedItem item;
   final VoidCallback onTap;
 
   const _ReportCard({required this.item, required this.onTap});
 
-  /// Determines the display style based on the report status.
-  /// This is presentation logic and is kept within the view file.
+  /// Determines the display style based on report status
   Map<String, dynamic> _getStatusStyle() {
     switch (item.status) {
       case ReportStatus.resolved:
@@ -122,14 +108,15 @@ class _ReportCard extends StatelessWidget {
                     Text(
                       item.itemName,
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 18),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'Reported on ${item.reportDate}',
-                      style:
-                      TextStyle(fontSize: 14, color: Colors.grey),
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                   ],
                 ),

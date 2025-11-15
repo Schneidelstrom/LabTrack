@@ -1,26 +1,23 @@
-// lib/views/return_view.dart
 import 'package:flutter/material.dart';
 import 'package:labtrack/student/controllers/return.dart';
 import 'package:labtrack/student/models/return_item.dart';
 import 'package:labtrack/student/widgets/app_bar.dart';
 import 'package:labtrack/student/widgets/drawer.dart';
-/// The UI for displaying the history of returned items.
-/// This view is responsible for rendering the list and delegating user actions
-/// to the [ReturnController].
+
+/// For displaying the history of returned items.
 class ReturnView extends StatefulWidget {
   const ReturnView({super.key});
   @override
   State<ReturnView> createState() => _ReturnViewState();
 }
+
 class _ReturnViewState extends State<ReturnView> {
-// The controller manages the data and business logic for this screen.
   final ReturnController _controller = ReturnController();
   late Future<void> _returnsFuture;
 
   @override
   void initState() {
     super.initState();
-// Asynchronously load the return history when the view is initialized.
     _returnsFuture = _controller.loadReturnItems();
   }
 
@@ -32,16 +29,8 @@ class _ReturnViewState extends State<ReturnView> {
       body: FutureBuilder<void>(
         future: _returnsFuture,
         builder: (context, snapshot) {
-// Show a loading indicator while data is being fetched.
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          // Show an error message if fetching fails.
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-
-          // If the return history is empty, display a message.
+          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+          if (snapshot.hasError) return Center(child: Text('Error: ${snapshot.error}'));
           if (_controller.returnItems.isEmpty) {
             return const Center(
               child: Text(
@@ -51,7 +40,6 @@ class _ReturnViewState extends State<ReturnView> {
             );
           }
 
-          // Once data is loaded, build the list of return cards.
           return ListView.builder(
             padding: const EdgeInsets.all(16.0),
             itemCount: _controller.returnItems.length,
@@ -69,9 +57,7 @@ class _ReturnViewState extends State<ReturnView> {
   }
 }
 
-// --- Private UI Widget ---
-/// A card widget to display the details of a single returned item transaction.
-/// This is a stateless presentation widget.
+/// Card widget to display the details of a single returned item transaction
 class _ReturnedItemCard extends StatelessWidget {
   final ReturnItem item;
   final VoidCallback onTap;
@@ -79,7 +65,6 @@ class _ReturnedItemCard extends StatelessWidget {
   const _ReturnedItemCard({required this.item, required this.onTap});
 
   /// Determines the display text and color for the status badge.
-  /// This is presentation logic and belongs in the view.
   (String, Color) _getStatusDisplay(ReturnStatus status) {
     switch (status) {
       case ReturnStatus.complete:
@@ -89,13 +74,10 @@ class _ReturnedItemCard extends StatelessWidget {
     }
   }
 
-  /// Formats the quantity display based on the return status.
+  /// Formats the quantity display based on the return status
   String _getItemsDisplay() {
-    if (item.status == ReturnStatus.complete) {
-      return 'Items: ${item.quantity}';
-    } else {
-      return 'Items: ${item.returnedQuantity}/${item.quantity}';
-    }
+    if (item.status == ReturnStatus.complete) return 'Items: ${item.quantity}';
+    else return 'Items: ${item.returnedQuantity}/${item.quantity}';
   }
 
   @override
@@ -119,12 +101,17 @@ class _ReturnedItemCard extends StatelessWidget {
                     Text(
                       item.courseCode,
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 18),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '${_getItemsDisplay()} • Borrowed: ${item.borrowDate}',
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                      style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey
+                      ),
                     ),
                   ],
                 ),
@@ -145,7 +132,8 @@ class _ReturnedItemCard extends StatelessWidget {
                       style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 12),
+                          fontSize: 12
+                      ),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -154,7 +142,8 @@ class _ReturnedItemCard extends StatelessWidget {
                     style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey,
-                        fontWeight: FontWeight.w500),
+                        fontWeight: FontWeight.w500
+                    ),
                   ),
                 ],
               )

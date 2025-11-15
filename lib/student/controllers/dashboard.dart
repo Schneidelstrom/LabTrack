@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:labtrack/student/models/borrow_transaction.dart';
 import 'package:labtrack/student/models/cart_item.dart';
@@ -30,8 +29,7 @@ class DashboardController {
   List<Map<String, String>> get reportsSummary => _reportsSummary;
 
   Future<void> loadData() async {
-    await Future.delayed(
-        const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
     _borrowedItems = [
       BorrowTransaction(
         transactionId: 'TXN-00123',
@@ -77,8 +75,7 @@ class DashboardController {
       {'name': 'Bunsen Burner', 'status': '1x'},
     ];
 
-    _hasPenalty =
-        _borrowedItems.any((item) => calculateDaysLeft(item.deadlineDate) < 0);
+    _hasPenalty = _borrowedItems.any((item) => calculateDaysLeft(item.deadlineDate) < 0);
   }
 
   /// Method to calculate days left until deadline
