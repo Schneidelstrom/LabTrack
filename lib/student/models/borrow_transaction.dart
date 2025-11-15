@@ -1,3 +1,5 @@
+import 'package:labtrack/student/models/cart_item.dart';
+
 class BorrowTransaction {
   final String transactionId;
   final String courseCode;
@@ -6,7 +8,8 @@ class BorrowTransaction {
   final String dateBorrowed;
   final String deadlineDate;
   final List<String> groupMembers;
-  final List<Map<String, dynamic>> borrowedItems;
+
+  final List<CartItem> borrowedItems;
 
   const BorrowTransaction({
     required this.transactionId,

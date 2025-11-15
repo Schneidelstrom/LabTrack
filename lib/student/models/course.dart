@@ -16,7 +16,4 @@ class Course {
 
   @override
   int get hashCode => code.hashCode ^ title.hashCode;
-
-  @override
-  String toString() => 'Course(code: $code, title: $title)';
 }
