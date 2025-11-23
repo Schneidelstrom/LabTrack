@@ -4,17 +4,24 @@ import 'package:flutter/material.dart';
 class TransactionViewerController {
   /// Calculates the number of days left until the deadline.
   int calculateDaysLeft(String deadlineDate) {
+    if (deadlineDate.isEmpty) return 0;
     final now = DateTime.now();
-    final deadline = DateTime.parse(deadlineDate);
-    final difference = deadline.difference(now);
-    if (difference.isNegative && difference.inHours > -24) return -1; // .inDays truncates so a difference of -23 hours is 0 days, adjust so that any past deadline is at least -1
-    return difference.inDays;
+    try {
+      final deadline = DateTime.parse(deadlineDate);
+      final difference = deadline.difference(now);
+      if (difference.isNegative && difference.inHours > -24) return -1;
+      return difference.inDays;
+    } catch (e) {
+      print("Error parsing deadline date: $e");
+      return 0;
+    }
   }
 
   /// Determines the text to display in the status banner based on days left
   String getDaysLeftText(int daysLeft) {
-    if (daysLeft < 0) return 'OVERDUE by ${daysLeft.abs()} days remaining';
-    else return '${daysLeft.abs()} days remaining';
+    if (daysLeft < 0) return 'OVERDUE by ${daysLeft.abs()} daysLeft days remaining';
+    if (daysLeft == 0) return 'DUE TODAY';
+    return '$daysLeft days left';
   }
 
   /// Determines the color of the status banner based on days left

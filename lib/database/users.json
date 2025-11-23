@@ -1,7 +1,7 @@
 {
   "users": [
     {
-      "upmail": "jdelacruz@up.edu.ph",
+      "upmail": "jrdelacruz@up.edu.ph",
       "fname": "Juan",
       "mname": "Reyes",
       "lname": "Dela Cruz",
@@ -12,7 +12,7 @@
       "role": "student"
     },
     {
-      "upmail": "asmith@up.edu.ph",
+      "upmail": "a.smith@up.edu.ph",
       "fname": "Alice",
       "mname": null,
       "lname": "Smith",
@@ -23,7 +23,7 @@
       "role": "student"
     },
     {
-      "upmail": "m.garcia@up.edu.ph",
+      "upmail": "msgarcia@up.edu.ph",
       "fname": "Maria",
       "mname": "Santos",
       "lname": "Garcia",
@@ -35,25 +35,69 @@
     },
     {
       "upmail": "student@up.edu.ph",
-      "fname": "Jade Eric",
-      "mname": "Indic",
-      "lname": "Petilla",
-      "sid": "2023-05021",
+      "fname": "Student",
+      "mname": null,
+      "lname": null,
+      "sid": "2021-00005",
       "dprogram": "BS Computer Science",
       "ylevel": 3,
       "cnumber": "09124569511",
       "role": "student"
     },
     {
-      "upmail": "profdavis@up.edu.ph",
+      "upmail": "rldavis@up.edu.ph",
       "fname": "Robert",
       "mname": "Lee",
       "lname": "Davis",
-      "sid": "N/A",
+      "sid": "8934-0012",
       "dprogram": "College of Science",
-      "ylevel": 0,
+      "ylevel": 4,
       "cnumber": "09204567890",
       "role": "staff"
+    },
+    {
+      "upmail": "bajohnson@up.edu.ph",
+      "fname": "Bob",
+      "mname": "Allen",
+      "lname": "Johnson",
+      "sid": "2023-00004",
+      "dprogram": "BS Chemistry",
+      "ylevel": 2,
+      "cnumber": "09165432109",
+      "role": "student"
+    },
+    {
+      "upmail": "l.chen@up.edu.ph",
+      "fname": "Li",
+      "mname": null,
+      "lname": "Chen",
+      "sid": "2021-00005",
+      "dprogram": "BS Biochemistry",
+      "ylevel": 4,
+      "cnumber": "09156789012",
+      "role": "student"
+    },
+    {
+      "upmail": "scsantos@up.edu.ph",
+      "fname": "Sofia",
+      "mname": "Cruz",
+      "lname": "Santos",
+      "sid": "2022-00006",
+      "dprogram": "BS Physics",
+      "ylevel": 3,
+      "cnumber": "09147890123",
+      "role": "student"
+    },
+    {
+      "upmail": "djwilliams@up.edu.ph",
+      "fname": "David",
+      "mname": "Johnson",
+      "lname": "Williams",
+      "sid": "2024-00007",
+      "dprogram": "BS Biology",
+      "ylevel": 1,
+      "cnumber": "09138901234",
+      "role": "student"
     }
   ]
 }

@@ -22,9 +22,9 @@ class _RequestViewState extends State<RequestView> {
     _requestsFuture = _controller.loadRequests();
   }
 
-  /// Handle cancellation of a request and refreshe UI
-  void _cancelRequest(RequestItem request) {
-    _controller.cancelRequest(context, request);
+  /// Handle cancellation of a request and refresh UI
+  void _cancelRequest(RequestItem request) async {
+    await _controller.cancelRequest(context, request);
     setState(() {});
   }
 

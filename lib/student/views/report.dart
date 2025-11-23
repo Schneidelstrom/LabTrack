@@ -1,24 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:labtrack/student/controllers/report.dart';
 import 'package:labtrack/student/models/cart_item.dart';
+import 'package:labtrack/student/models/user.dart';
 import 'package:labtrack/student/widgets/app_bar.dart';
 import 'package:labtrack/student/widgets/drawer.dart';
 
 /// For reporting a damaged or lost item with a list of currently borrowed items that can be reported and aform to submit a report for a selected item
 class ReportView extends StatefulWidget {
-  const ReportView({super.key});
+  final UserModel currentUser;
+
+  const ReportView({super.key, required this.currentUser});
 
   @override
   State<ReportView> createState() => _ReportViewState();
 }
 
 class _ReportViewState extends State<ReportView> {
-  final ReportController _controller = ReportController();
+  late final ReportController _controller;
   late Future<void> _itemsFuture;
 
   @override
   void initState() {
     super.initState();
+    _controller = ReportController(currentUser: widget.currentUser);
     _itemsFuture = _controller.loadBorrowedItems();
   }
 
@@ -106,8 +110,9 @@ class _ReportViewState extends State<ReportView> {
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
             ),
-            onPressed: () {
-              setState(() => _controller.submitReport(context));
+            onPressed: () async {
+              await _controller.submitReport(context);
+              setState(() {});
             },
             child: const Text('Submit Report', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
           ),

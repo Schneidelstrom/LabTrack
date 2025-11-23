@@ -1,11 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:labtrack/student/models/user.dart';
+import 'package:labtrack/student/services/database.dart';
 
-typedef LoadingCallback = void Function(bool isLoading); // For updating loading state in view
+typedef LoadingCallback = void Function(bool isLoading);
 
 /// User authentication with Firebase, input validation, and showing feedback to user for the [LoginView]
 class LoginController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final DatabaseService _dbService = DatabaseService();
 
   /// Shows dialog with message
   void _showInfoPopup(BuildContext context, String message) {
@@ -13,7 +16,6 @@ class LoginController {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
-
         Future.delayed(const Duration(seconds: 3), () { // Dismiss dialog after 3 seconds
           if (Navigator.of(dialogContext).canPop()) Navigator.of(dialogContext).pop();
         });
@@ -46,25 +48,34 @@ class LoginController {
       return;
     }
     if (!email.endsWith('@up.edu.ph')) {
-      _showInfoPopup(
-          context, 'Invalid Email: Must be a valid @up.edu.ph address.');
+      _showInfoPopup(context, 'Invalid Email: Must be a valid @up.edu.ph address.');
       return;
     }
-    onLoadingChanged(true); // Signal view to show loading indicator
+    onLoadingChanged(true);
 
     try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password); // Use Firebase Auth to sign in
-      if (context.mounted) Navigator.pushReplacementNamed(context, '/main');  // Go to main screen on success
+      final userCredential = await _auth.signInWithEmailAndPassword(email: email, password: password);
+
+      if (userCredential.user != null && context.mounted) {
+        final UserModel? userModel = await _dbService.getUserByEmail(email);
+
+        if (userModel != null) {
+          if (userModel.role == UserRole.staff) Navigator.pushReplacementNamed(context, '/staff_dashboard');
+          else Navigator.pushReplacementNamed(context, '/main');
+        } else {
+          _showInfoPopup(context, 'User profile data not found. Please contact an administrator.');
+          await _auth.signOut();
+        }
+      }
     } on FirebaseAuthException catch (e) {
-      // Handle authentication errors
       String message = 'An unknown error occurred.';
       if (e.code == 'user-not-found' || e.code == 'wrong-password' || e.code == 'invalid-credential') message = 'Invalid email or password. Please try again.';
       else if (e.code == 'user-disabled') message = 'This account has been disabled. Please contact support.';
       else if (e.code == 'invalid-email') message = 'The email address is not valid.';
       _showInfoPopup(context, message);
     } catch (e) {
-      _showInfoPopup(context, 'An unexpected error occurred. Please try again.'); // Handle unexpected errors
-    } finally { // Ensure loading indicator is hidden even if error occurs
+      _showInfoPopup(context, 'An unexpected error occurred. Please try again.');
+    } finally {
       if (context.mounted) onLoadingChanged(false);
     }
   }

@@ -1,29 +1,39 @@
 {
 "reported_items": [
 {
-"itemName": "Bunsen Burner",
-"reportDate": "2025-11-10",
-"status": "under_review"
+  "reportId": "TNREP-2025-001",
+  "itemName": "Bunsen Burner",
+  "reportDate": "2025-11-10",
+  "status": "under_review",
+  "reporterUpMail": "bajohnson@up.edu.ph"
 },
 {
-"itemName": "Microscope Lens",
-"reportDate": "2025-11-05",
-"status": "resolved"
+  "reportId": "TNREP-2025-002",
+  "itemName": "Microscope Lens",
+  "reportDate": "2025-11-05",
+  "status": "resolved",
+  "reporterUpMail": "l.chen@up.edu.ph"
 },
 {
-"itemName": "Beaker (500ml)",
-"reportDate": "2025-10-28",
-"status": "resolved"
+  "reportId": "TNREP-2025-003",
+  "itemName": "Beaker (500ml)",
+  "reportDate": "2025-10-28",
+  "status": "resolved",
+  "reporterUpMail": "scsantos@up.edu.ph"
 },
 {
-"itemName": "Digital Scale",
-"reportDate": "2025-11-14",
-"status": "under_review"
+  "reportId": "TNREP-2025-004",
+  "itemName": "Digital Scale",
+  "reportDate": "2025-11-14",
+  "status": "under_review",
+  "reporterUpMail": "djwilliams@up.edu.ph"
 },
 {
-"itemName": "Test Tube",
-"reportDate": "2025-10-15",
-"status": "resolved"
+  "reportId": "TNREP-2025-005",
+  "itemName": "Test Tube",
+  "reportDate": "2025-10-15",
+  "status": "resolved",
+  "reporterUpMail": "jrdelacruz@up.edu.ph"
 }
 ]
 }

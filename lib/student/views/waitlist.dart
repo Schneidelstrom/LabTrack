@@ -21,8 +21,8 @@ class _WaitlistViewState extends State<WaitlistView> {
     _waitlistFuture = _controller.loadWaitlistItems();
   }
 
-  void _cancelReservation(WaitlistItem item) {
-    _controller.cancelReservation(context, item);
+  void _cancelReservation(WaitlistItem item) async {
+    await _controller.cancelReservation(context, item);
     setState(() {});
   }
 

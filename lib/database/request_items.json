@@ -1,29 +1,39 @@
 {
 "request_items": [
 {
-"courseCode": "PHYS-103",
-"itemCount": 5,
-"requestDate": "2025-11-12"
+  "requestId": "TNREQ-2025-001",
+  "courseCode": "PHYS-103",
+  "itemCount": 5,
+  "requestDate": "2025-11-12",
+  "requesterUpMail": "a.smith@up.edu.ph"
 },
 {
-"courseCode": "CHEM-102",
-"itemCount": 15,
-"requestDate": "2025-11-11"
+  "requestId": "TNREQ-2025-002",
+  "courseCode": "CHEM-102",
+  "itemCount": 15,
+  "requestDate": "2025-11-11",
+  "requesterUpMail": "msgarcia@up.edu.ph"
 },
 {
-"courseCode": "BIO-107",
-"itemCount": 8,
-"requestDate": "2025-11-10"
+  "requestId": "TNREQ-2025-003",
+  "courseCode": "BIO-107",
+  "itemCount": 8,
+  "requestDate": "2025-11-10",
+  "requesterUpMail": "student@up.edu.ph"
 },
 {
-"courseCode": "ENVI-SCI-100",
-"itemCount": 3,
-"requestDate": "2025-11-09"
+  "requestId": "TNREQ-2025-004",
+  "courseCode": "ENVI-SCI-100",
+  "itemCount": 3,
+  "requestDate": "2025-11-09",
+  "requesterUpMail": "rldavis@up.edu.ph"
 },
 {
-"courseCode": "BIOCHEM-111",
-"itemCount": 12,
-"requestDate": "2025-11-08"
+  "requestId": "TNREQ-2025-005",
+  "courseCode": "BIOCHEM-111",
+  "itemCount": 12,
+  "requestDate": "2025-11-08",
+  "requesterUpMail": "bajohnson@up.edu.ph"
 }
 ]
 }

@@ -3,11 +3,12 @@ import 'package:labtrack/student/controllers/checkout.dart';
 import 'package:labtrack/student/models/cart_item.dart';
 import 'package:labtrack/student/models/course.dart';
 import 'package:labtrack/student/models/user.dart';
+import 'package:labtrack/student/models/lab_item.dart';
 
 /// For displaying the cart, managing group members, selecting a course, and confirming the borrow request
 class CheckoutView extends StatefulWidget {
   final UserModel currentUser;
-  final Set<String> selectedItems;
+  final List<LabItem> selectedItems;
   final Set<UserModel> initialGroupMembers;
   final Course? initialCourse;
 
@@ -31,12 +32,14 @@ class _CheckoutViewState extends State<CheckoutView> {
     super.initState();
     _controller = CheckoutController(
       currentUser: widget.currentUser,
-      selectedItemNames: widget.selectedItems,
+      selectedItems: widget.selectedItems,
       initialGroupMembers: widget.initialGroupMembers,
       initialCourse: widget.initialCourse,
     );
 
-    _controller.loadInitialData();
+    _controller.loadInitialData().then((_) {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
@@ -65,7 +68,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                 itemCount: _controller.cartItems.length,
                 itemBuilder: (context, index) {
                   final item = _controller.cartItems[index];
-                  return _CartItemCard(item: item, onIncrement: () => setState(() => _controller.incrementQuantity(index)), onDecrement: () => setState(() => _controller.decrementQuantity(index)),);
+                  return _CartItemCard(item: item, onIncrement: () => setState(() => _controller.incrementQuantity(index, context)), onDecrement: () => setState(() => _controller.decrementQuantity(index)),);
                 },
               ),
             ),
@@ -227,7 +230,7 @@ class _CheckoutBar extends StatelessWidget {
             items: controller.allCourses.map((Course course) {
               return DropdownMenuItem<Course>(
                 value: course,
-                child: Text(course.code),
+                child: Text(course.courseCode),
               );
             }).toList(),
             // Update state and view rebuilds

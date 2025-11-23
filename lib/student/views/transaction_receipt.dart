@@ -91,14 +91,14 @@ class _TransactionViewerViewState extends State<TransactionViewerView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Transaction ID: ${transaction.transactionId}',
+                'Transaction ID: ${transaction.borrowId}',
                 style: Theme.of(context).textTheme.titleSmall,
               ),
               const Divider(height: 20, thickness: 1),
               _buildReceiptRow(context, 'Course:', '${transaction.courseCode} - ${transaction.courseName}'),
               _buildReceiptRow(context, 'Date Borrowed:', transaction.dateBorrowed),
               _buildReceiptRow(context, 'Deadline:', transaction.deadlineDate),
-              _buildReceiptRow(context, 'Borrower:', transaction.borrowerName),
+              _buildReceiptRow(context, 'Borrower:', transaction.borrowerUpMail),
               const SizedBox(height: 10),
               // Status banner
               Container(

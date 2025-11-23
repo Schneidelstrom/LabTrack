@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:labtrack/firebase_options.dart';
+import 'package:labtrack/staff/dashboard.dart';
 import 'package:labtrack/student/main_screen.dart';
 import 'package:labtrack/student/views/log_in.dart';
 
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => const LoginView(),
         '/main': (context) => const MainScreen(),
+        '/staff_dashboard': (context) => const StaffDashboard(),
       },
     );
   }

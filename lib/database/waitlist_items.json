@@ -1,34 +1,44 @@
 {
 "waitlist_items": [
 {
-"name": "Digital Scale",
-"courseCode": "PHYS-103",
-"statusMessage": "#1",
-"status": "in_queue"
+  "waitlistId": "TNWTL-2025-001",
+  "name": "Digital Scale",
+  "courseCode": "PHYS-103",
+  "statusMessage": "#1",
+  "status": "in_queue",
+  "waitlistedUpMail": "msgarcia@up.edu.ph"
 },
 {
-"name": "Microscope",
-"courseCode": "BIO-107",
-"statusMessage": "PICK-UP",
-"status": "ready_for_pickup"
+  "waitlistId": "TNWTL-2025-002",
+  "name": "Microscope",
+  "courseCode": "BIO-107",
+  "statusMessage": "PICK-UP",
+  "status": "ready_for_pickup",
+  "waitlistedUpMail": "student@up.edu.ph"
 },
 {
-"name": "Digital Scale",
-"courseCode": "CHEM-102",
-"statusMessage": "#2",
-"status": "in_queue"
+  "waitlistId": "TNWTL-2025-003",
+  "name": "Digital Scale",
+  "courseCode": "CHEM-102",
+  "statusMessage": "#2",
+  "status": "in_queue",
+  "waitlistedUpMail": "rldavis@up.edu.ph"
 },
 {
-"name": "Hot Plate",
-"courseCode": "BIOCHEM-111",
-"statusMessage": "PICK-UP",
-"status": "ready_for_pickup"
+  "waitlistId": "TNWTL-2025-004",
+  "name": "Hot Plate",
+  "courseCode": "BIOCHEM-111",
+  "statusMessage": "PICK-UP",
+  "status": "ready_for_pickup",
+  "waitlistedUpMail": "bajohnson@up.edu.ph"
 },
 {
-"name": "Safety Goggles",
-"courseCode": "CHEM-102",
-"statusMessage": "#5",
-"status": "in_queue"
+  "waitlistId": "TNWTL-2025-005",
+  "name": "Safety Goggles",
+  "courseCode": "CHEM-102",
+  "statusMessage": "#5",
+  "status": "in_queue",
+  "waitlistedUpMail": "l.chen@up.edu.ph"
 }
 ]
 }

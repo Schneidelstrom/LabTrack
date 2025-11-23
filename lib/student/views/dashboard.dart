@@ -21,6 +21,7 @@ class _DashboardViewState extends State<DashboardView> {
   void initState() {
     super.initState();
     _loadingFuture = _controller.loadData();
+    if (mounted) setState(() {});
   }
 
   /// Refreshes dashboard data after returning from a screen that might have changed the state

@@ -1,39 +1,49 @@
 {
 "penalties": [
 {
-"itemName": "Beaker (250ml)",
-"reason": "Overdue Return",
-"dateIncurred": "2025-11-14",
-"amount": 5.00,
-"status": "unresolved"
+  "penaltyId": "TNPEN-2025-001",
+  "itemName": "Beaker (250ml)",
+  "reason": "Overdue Return",
+  "dateIncurred": "2025-11-14",
+  "amount": 5.00,
+  "status": "unresolved",
+  "penalizedUpMail": "jrdelacruz@up.edu.ph"
 },
 {
-"itemName": "Microscope",
-"reason": "Damaged Item",
-"dateIncurred": "2025-10-28",
-"amount": 75.50,
-"status": "unresolved"
+  "penaltyId": "TNPEN-2025-002",
+  "itemName": "Microscope",
+  "reason": "Damaged Item",
+  "dateIncurred": "2025-10-28",
+  "amount": 75.50,
+  "status": "unresolved",
+  "penalizedUpMail": "a.smith@up.edu.ph"
 },
 {
-"itemName": "Bunsen Burner",
-"reason": "Overdue Return",
-"dateIncurred": "2025-11-10",
-"amount": 15.00,
-"status": "resolved"
+  "penaltyId": "TNPEN-2025-003",
+  "itemName": "Bunsen Burner",
+  "reason": "Overdue Return",
+  "dateIncurred": "2025-11-10",
+  "amount": 15.00,
+  "status": "resolved",
+  "penalizedUpMail": "msgarcia@up.edu.ph"
 },
 {
-"itemName": "Lab Coat (Medium)",
-"reason": "Lost Item",
-"dateIncurred": "2025-09-15",
-"amount": 150.00,
-"status": "unresolved"
+  "penaltyId": "TNPEN-2025-004",
+  "itemName": "Lab Coat (Medium)",
+  "reason": "Lost Item",
+  "dateIncurred": "2025-09-15",
+  "amount": 150.00,
+  "status": "unresolved",
+  "penalizedUpMail": "student@up.edu.ph"
 },
 {
-"itemName": "Hot Plate",
-"reason": "Overdue Return",
-"dateIncurred": "2025-10-01",
-"amount": 25.00,
-"status": "resolved"
+  "penaltyId": "TNPEN-2025-005",
+  "itemName": "Hot Plate",
+  "reason": "Overdue Return",
+  "dateIncurred": "2025-10-01",
+  "amount": 25.00,
+  "status": "resolved",
+  "penalizedUpMail": "rldavis@up.edu.ph"
 }
 ]
 }

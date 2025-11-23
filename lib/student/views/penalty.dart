@@ -22,6 +22,11 @@ class _PenaltyViewState extends State<PenaltyView> {
     _penaltiesFuture = _controller.loadPenalties();
   }
 
+  void _payForPenalty(Penalty penalty) async {
+    await _controller.handlePayNow(context, penalty);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,7 +53,7 @@ class _PenaltyViewState extends State<PenaltyView> {
               final penalty = _controller.penalties[index];
               return _PenaltyCard(
                 item: penalty,
-                onPayNow: () => _controller.handlePayNow(context, penalty),
+                  onPayNow: () => _payForPenalty(penalty),
               );
             },
           );

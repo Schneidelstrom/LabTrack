@@ -12,25 +12,67 @@ class BorrowView extends StatefulWidget {
   @override
   State<BorrowView> createState() => _BorrowViewState();
 }
+
 class _BorrowViewState extends State<BorrowView> {
   late final BorrowController _controller;
+  late Future<void> _itemsFuture;
+  String _searchTerm = '';
+  String? _selectedCategory;
 
   @override
   void initState() {
     super.initState();
     _controller = BorrowController(currentUser: widget.currentUser);
-    _controller.loadItems();
+    _itemsFuture = _controller.loadItems();
   }
 
   void _toggleItemSelection(LabItem item) {
     setState(() {
-      _controller.toggleItemSelection(item);
+      _controller.toggleItemSelection(item, context);
     });
   }
 
   Future<void> _navigateToCheckout() async {
     await _controller.navigateToCheckout(context);
     setState(() {});
+  }
+
+  void _runFilter() {
+    setState(() {
+      _controller.applyFilters(
+        searchTerm: _searchTerm,
+        category: _selectedCategory,
+      );
+    });
+  }
+
+  Future<void> _showFilterDialog() async {
+    final categories = _controller.uniqueCategories.toList()..sort();
+    final String? result = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text('Filter by Category'),
+          children: [
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(context, null),
+              child: const Text('All Categories'),
+            ),
+            ...categories.map((category) {
+              return SimpleDialogOption(
+                onPressed: () => Navigator.pop(context, category),
+                child: Text(category),
+              );
+            }).toList(),
+          ],
+        );
+      },
+    );
+
+    if (result != _selectedCategory) {
+      _selectedCategory = result;
+      _runFilter();
+    }
   }
 
   @override
@@ -42,10 +84,16 @@ class _BorrowViewState extends State<BorrowView> {
         appBar: const CommonAppBar(title: 'Borrow'),
         body: Column(
           children: [
-            const _SearchBar(),
+            _SearchBar(
+              onSearchChanged: (query) {
+                _searchTerm = query;
+                _runFilter();
+              },
+              onFilterPressed: _showFilterDialog,
+            ),
             Expanded(
               child: FutureBuilder<void>(
-                future: _controller.loadItems(),
+                future: _itemsFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
                   if (snapshot.hasError) return Center(child: Text('Error: ${snapshot.error}'));
@@ -58,9 +106,9 @@ class _BorrowViewState extends State<BorrowView> {
                       mainAxisSpacing: 16,
                       childAspectRatio: 0.9,
                     ),
-                    itemCount: _controller.items.length,
+                    itemCount: _controller.filteredItems.length,
                     itemBuilder: (context, index) {
-                      final item = _controller.items[index];
+                      final item = _controller.filteredItems[index];
                       final isSelected = _controller.isSelected(item);
                       return _ItemCard(item: item, isSelected: isSelected, onTap: () => _toggleItemSelection(item),);
                     },
@@ -76,28 +124,63 @@ class _BorrowViewState extends State<BorrowView> {
   }
 }
 
-class _SearchBar extends StatelessWidget {
-  const _SearchBar();
+class _SearchBar extends StatefulWidget {
+  final Function(String) onSearchChanged;
+  final VoidCallback onFilterPressed;
+
+  const _SearchBar({
+    required this.onSearchChanged,
+    required this.onFilterPressed,
+  });
+
+  @override
+  State<_SearchBar> createState() => _SearchBarState();
+}
+
+class _SearchBarState extends State<_SearchBar> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(() {
+      widget.onSearchChanged(_controller.text);
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: TextField(
+        controller: _controller,
         decoration: InputDecoration(
           labelText: 'Search Item',
           hintText: 'e.g., microscope, beaker, etc.',
           prefixIcon: const Icon(Icons.search, color: Colors.grey),
           suffixIcon: IconButton(
             icon: const Icon(Icons.filter_list, color: Colors.grey),
-            onPressed: () { /* TODO: Connect to controller for filtering logic */},
+            onPressed: widget.onFilterPressed,
           ),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0), borderSide: BorderSide.none),
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20.0),
+              borderSide: BorderSide.none),
           filled: true,
           fillColor: Colors.white,
           contentPadding:
           const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
-          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0), borderSide: BorderSide(color: Colors.grey.shade300)),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0), borderSide: const BorderSide(color: Colors.blueAccent, width: 2.0)),
+          enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20.0),
+              borderSide: BorderSide(color: Colors.grey.shade300)),
+          focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20.0),
+              borderSide: const BorderSide(color: Colors.blueAccent, width: 2.0)),
         ),
       ),
     );

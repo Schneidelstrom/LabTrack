@@ -1,59 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:labtrack/student/models/borrow_transaction.dart';
+import 'package:labtrack/staff/staff_dashboard_controller.dart';
 
-class StaffDashboard extends StatelessWidget {
+class StaffDashboard extends StatefulWidget {
   const StaffDashboard({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const StaffDashboardPage();
-  }
+  State<StaffDashboard> createState() => _StaffDashboardState();
 }
 
-class StaffDashboardPage extends StatefulWidget {
-  const StaffDashboardPage({super.key});
+class _StaffDashboardState extends State<StaffDashboard> {
+  late final StaffDashboardController _controller;
+  late Future<void> _dataFuture;
+  int _selectedIndex = 0;
+  final navItems = ['Dashboard', 'Returns', 'Inventory', 'Student Accounts', 'Penalties', 'Settings'];
 
   @override
-  State<StaffDashboardPage> createState() => _StaffDashboardPageState();
-}
+  void initState() {
+    super.initState();
+    _controller = StaffDashboardController();
+    _dataFuture = _controller.loadInitialData();
+  }
 
-class _StaffDashboardPageState extends State<StaffDashboardPage> {
-  int _selectedIndex = 0;
-
-  final List<Map<String, String>> pendingRequests = [
-    {"id": "REQ-001", "student": "John Doe", "item": "Microscope", "date": "2025-09-20"},
-    {"id": "REQ-002", "student": "Jane Smith", "item": "Beaker", "date": "2025-09-21"},
-    {"id": "REQ-003", "student": "Andrew Lee", "item": "Pipette", "date": "2025-09-22"},
-  ];
-
-  final List<Map<String, String>> pendingReturns = [
-    {"student": "John Doe", "item": "Microscope", "due": "2025-09-25"},
-    {"student": "Jane Smith", "item": "Beaker", "due": "2025-09-25"},
-    {"student": "Andrew Lee", "item": "Pipette", "due": "2025-09-20"},
-  ];
-
-  final List<Map<String, String>> recentActivity = [
-    {"msg": "John Doe borrowed Microscope (Approved)"},
-    {"msg": "Jane Smith returned Beaker (No issues)"},
-    {"msg": "Penalty issued to Andrew Lee (₱100 fine)"},
-    {"msg": "Student A created by User"},
-  ];
-
-  final stats = {
-    'totalItems': 250,
-    'borrowedNow': 73,
-    'available': 177,
-    'overdue': 5,
-  };
-
-  final navItems = [
-    'Dashboard',
-    'Borrow Requests',
-    'Returns',
-    'Inventory',
-    'Student Accounts',
-    'Penalties',
-    'Settings',
-  ];
+  void _refreshData() {
+    setState(() {
+      _dataFuture = _controller.loadInitialData();
+    });
+  }
 
   Widget _buildSidebar() {
     return Container(
@@ -150,6 +123,8 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
   }
 
   Widget _buildTopBar() {
+    // Personalized welcome message
+    final userName = _controller.currentUser?.firstName ?? 'Staff';
     return Container(
       height: 64,
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -160,210 +135,71 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
       child: Row(
         children: [
           const Spacer(),
-          const Text('Welcome, User', style: TextStyle(fontWeight: FontWeight.w600)),
+          Text('Welcome, $userName', style: const TextStyle(fontWeight: FontWeight.w600)),
           const SizedBox(width: 16),
           IconButton(onPressed: () {}, icon: const Icon(Icons.notifications_none)),
           const SizedBox(width: 8),
-          const CircleAvatar(child: Icon(Icons.person)),
+          CircleAvatar(child: Text(userName.isNotEmpty ? userName[0] : 'S')),
         ],
       ),
     );
   }
 
-  Widget _buildStatCard(String label, String value) {
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Container(
-        width: 160,
-        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildReturnsPage() {
+    return FutureBuilder(
+      future: _dataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting || _controller.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return Center(child: Text("Error loading data: ${snapshot.error}"));
+        }
+        return Column(
           children: [
-            Text(label, style: const TextStyle(fontSize: 13, color: Colors.black54)),
-            const SizedBox(height: 10),
-            Text(value, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPendingTable({
-    required String title,
-    required List<DataColumn> columns,
-    required List<DataRow> rows,
-  }) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 12),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(columns: columns, rows: rows),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRecentActivity() {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Recent Activity', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
-            ...recentActivity.map((a) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6.0),
-                  child: Row(
-                    children: [
-                      Container(width: 10, height: 10, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
-                      const SizedBox(width: 10),
-                      Expanded(child: Text(a['msg']!)),
-                    ],
-                  ),
-                )),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMainContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 20),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: _buildPendingTable(
-                title: "Pending Borrow Requests",
-                columns: const [
-                  DataColumn(label: Text('Request ID')),
-                  DataColumn(label: Text('Student Name')),
-                  DataColumn(label: Text('Item Name')),
-                  DataColumn(label: Text('Request Date')),
-                  DataColumn(label: Text('Action')),
-                ],
-                rows: pendingRequests.map((r) {
-                  return DataRow(cells: [
-                    DataCell(Text(r['id']!)),
-                    DataCell(Text(r['student']!)),
-                    DataCell(Text(r['item']!)),
-                    DataCell(Text(r['date']!)),
-                    DataCell(Row(
-                      children: [
-                        ElevatedButton(onPressed: () {}, child: const Text('Approve')),
-                        const SizedBox(width: 8),
-                        OutlinedButton(onPressed: () {}, child: const Text('Reject')),
-                      ],
-                    )),
-                  ]);
-                }).toList(),
+            // Search Bar
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                onChanged: (value) {
+                  setState(() {
+                    _controller.searchTransactions(value);
+                  });
+                },
+                decoration: InputDecoration(
+                  labelText: 'Search by Borrower, Course, or Item...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                ),
               ),
             ),
-            const SizedBox(width: 16),
+            // List of Transactions
             Expanded(
-              child: _buildPendingTable(
-                title: "Pending Returns",
-                columns: const [
-                  DataColumn(label: Text('Student Name')),
-                  DataColumn(label: Text('Item Name')),
-                  DataColumn(label: Text('Due Date')),
-                  DataColumn(label: Text('Action')),
-                ],
-                rows: pendingReturns.map((r) {
-                  return DataRow(cells: [
-                    DataCell(Text(r['student']!)),
-                    DataCell(Text(r['item']!)),
-                    DataCell(Text(r['due']!)),
-                    DataCell(Row(
-                      children: [
-                        ElevatedButton(onPressed: () {}, child: const Text('Mark Returned')),
-                        const SizedBox(width: 8),
-                        OutlinedButton(onPressed: () {}, child: const Text('Assign Penalty')),
-                      ],
-                    )),
-                  ]);
-                }).toList(),
+              child: _controller.filteredTransactions.isEmpty
+                  ? const Center(child: Text("No active borrow transactions found."))
+                  : ListView.builder(
+                itemCount: _controller.filteredTransactions.length,
+                itemBuilder: (context, index) {
+                  final tx = _controller.filteredTransactions[index];
+                  return _TransactionCard(
+                    transaction: tx,
+                    onReturn: () => _showReturnDialog(context, tx),
+                  );
+                },
               ),
             ),
           ],
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            _buildStatCard('Total Items', stats['totalItems'].toString()),
-            const SizedBox(width: 12),
-            _buildStatCard('Borrowed Now', stats['borrowedNow'].toString()),
-            const SizedBox(width: 12),
-            _buildStatCard('Available', stats['available'].toString()),
-            const SizedBox(width: 12),
-            _buildStatCard('Overdue', stats['overdue'].toString()),
-          ],
-        ),
-        const SizedBox(height: 16),
-        _buildRecentActivity(),
-      ],
+        );
+      },
     );
   }
 
   Widget _buildContentForIndex() {
     switch (_selectedIndex) {
-      case 0:
-        return _buildMainContent();
-      case 1:
-        return _buildPendingTable(
-          title: "Borrow Requests",
-          columns: const [
-            DataColumn(label: Text('Request ID')),
-            DataColumn(label: Text('Student Name')),
-            DataColumn(label: Text('Item Name')),
-            DataColumn(label: Text('Request Date')),
-            DataColumn(label: Text('Action')),
-          ],
-          rows: pendingRequests.map((r) {
-            return DataRow(cells: [
-              DataCell(Text(r['id']!)),
-              DataCell(Text(r['student']!)),
-              DataCell(Text(r['item']!)),
-              DataCell(Text(r['date']!)),
-              const DataCell(Text("...")),
-            ]);
-          }).toList(),
-        );
-      case 2:
-        return _buildPendingTable(
-          title: "Returns",
-          columns: const [
-            DataColumn(label: Text('Student Name')),
-            DataColumn(label: Text('Item Name')),
-            DataColumn(label: Text('Due Date')),
-            DataColumn(label: Text('Action')),
-          ],
-          rows: pendingReturns.map((r) {
-            return DataRow(cells: [
-              DataCell(Text(r['student']!)),
-              DataCell(Text(r['item']!)),
-              DataCell(Text(r['due']!)),
-              const DataCell(Text("...")),
-            ]);
-          }).toList(),
-        );
+      case 1: // Returns Page
+        return _buildReturnsPage();
       default:
-        return const Center(child: Text("Other Pages (UI only)"));
+        return Center(child: Text("${navItems[_selectedIndex]} Page (UI Only)"));
     }
   }
 
@@ -376,9 +212,12 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
           Expanded(
             child: Column(
               children: [
-                _buildTopBar(),
+                FutureBuilder(
+                  future: _dataFuture,
+                  builder: (context, snapshot) => _buildTopBar(),
+                ),
                 Expanded(
-                  child: SingleChildScrollView(
+                  child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                     child: _buildContentForIndex(),
                   ),
@@ -387,6 +226,109 @@ class _StaffDashboardPageState extends State<StaffDashboardPage> {
             ),
           )
         ],
+      ),
+    );
+  }
+
+  Future<void> _showReturnDialog(BuildContext context, BorrowTransaction transaction) async {
+    // Map to store the quantity of each item to be returned.
+    final Map<String, int> returnedQuantities = {
+      for (var item in transaction.borrowedItems) item.name: 0
+    };
+
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text('Process Return for ${transaction.courseCode}'),
+              content: SizedBox(
+                width: 400,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: transaction.borrowedItems.map((item) {
+                      return ListTile(
+                        title: Text(item.name),
+                        subtitle: Text('Borrowed: ${item.quantity}'),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.remove_circle),
+                              onPressed: () {
+                                setDialogState(() {
+                                  if (returnedQuantities[item.name]! > 0) {
+                                    returnedQuantities[item.name] = returnedQuantities[item.name]! - 1;
+                                  }
+                                });
+                              },
+                            ),
+                            Text('${returnedQuantities[item.name]}', style: const TextStyle(fontSize: 16)),
+                            IconButton(
+                              icon: const Icon(Icons.add_circle),
+                              onPressed: () {
+                                setDialogState(() {
+                                  // Can't return more than was borrowed
+                                  if (returnedQuantities[item.name]! < item.quantity) {
+                                    returnedQuantities[item.name] = returnedQuantities[item.name]! + 1;
+                                  }
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    Navigator.of(context).pop(); // Close dialog first
+                    await _controller.handleReturn(
+                      context: context,
+                      transaction: transaction,
+                      returnedQuantities: returnedQuantities,
+                    );
+                    _refreshData(); // Refresh the main list
+                  },
+                  child: const Text('Submit Return'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _TransactionCard extends StatelessWidget {
+  final BorrowTransaction transaction;
+  final VoidCallback onReturn;
+
+  const _TransactionCard({required this.transaction, required this.onReturn});
+
+  @override
+  Widget build(BuildContext context) {
+    final totalItems = transaction.borrowedItems.fold<int>(0, (sum, item) => sum + item.quantity);
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      child: ListTile(
+        title: Text('${transaction.courseCode} - ${transaction.borrowerUpMail}'),
+        subtitle: Text('$totalItems items borrowed on ${transaction.dateBorrowed}. Due: ${transaction.deadlineDate}'),
+        trailing: ElevatedButton(
+          onPressed: onReturn,
+          child: const Text('Process Return'),
+        ),
       ),
     );
   }

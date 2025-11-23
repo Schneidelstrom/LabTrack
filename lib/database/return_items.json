@@ -1,39 +1,49 @@
 {
 "return_items": [
 {
-"courseCode": "CHEM-102",
-"borrowDate": "2025-11-01",
-"returnDate": "2025-11-08",
-"quantity": 5,
-"returnedQuantity": 5
+  "returnId": "TNRTN-2025-001",
+  "courseCode": "CHEM-102",
+  "borrowDate": "2025-11-01",
+  "returnDate": "2025-11-08",
+  "quantity": 5,
+  "returnedQuantity": 5,
+  "returnerUpMail": "l.chen@up.edu.ph"
 },
 {
-"courseCode": "PHYS-103",
-"borrowDate": "2025-10-20",
-"returnDate": "2025-10-27",
-"quantity": 10,
-"returnedQuantity": 8
+  "returnId": "TNRTN-2025-002",
+  "courseCode": "PHYS-103",
+  "borrowDate": "2025-10-20",
+  "returnDate": "2025-10-27",
+  "quantity": 10,
+  "returnedQuantity": 8,
+  "returnerUpMail": "scsantos@up.edu.ph"
 },
 {
-"courseCode": "BIO-107",
-"borrowDate": "2025-11-05",
-"returnDate": "2025-11-12",
-"quantity": 2,
-"returnedQuantity": 2
+  "returnId": "TNRTN-2025-003",
+  "courseCode": "BIO-107",
+  "borrowDate": "2025-11-05",
+  "returnDate": "2025-11-12",
+  "quantity": 2,
+  "returnedQuantity": 2,
+  "returnerUpMail": "djwilliams@up.edu.ph"
 },
 {
-"courseCode": "BIOCHEM-111",
-"borrowDate": "2025-10-15",
-"returnDate": "2025-10-22",
-"quantity": 3,
-"returnedQuantity": 1
+  "returnId": "TNRTN-2025-004",
+  "courseCode": "BIOCHEM-111",
+  "borrowDate": "2025-10-15",
+  "returnDate": "2025-10-22",
+  "quantity": 3,
+  "returnedQuantity": 1,
+  "returnerUpMail": "jrdelacruz@up.edu.ph"
 },
 {
-"courseCode": "ENVI-SCI-100",
-"borrowDate": "2025-09-20",
-"returnDate": "2025-09-27",
-"quantity": 8,
-"returnedQuantity": 8
+  "returnId": "TNRTN-2025-005",
+  "courseCode": "ENVI-SCI-100",
+  "borrowDate": "2025-09-20",
+  "returnDate": "2025-09-27",
+  "quantity": 8,
+  "returnedQuantity": 8,
+  "returnerUpMail": "a.smith@up.edu.ph"
 }
 ]
 }

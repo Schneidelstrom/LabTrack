@@ -1,5 +1,7 @@
-import 'dart:convert';
-import 'package:flutter/services.dart';
+import 'package:labtrack/student/services/database.dart';
+import 'package:labtrack/student/models/return_item.dart';
+import 'package:labtrack/student/services/auth.dart';
+import 'package:labtrack/student/models/user.dart';
 
 /// Presentation-layer model to unify different transaction types for display
 class DisplayTransaction {
@@ -7,6 +9,7 @@ class DisplayTransaction {
   final String status;
   final String date;
   final String type;
+
   const DisplayTransaction({
     required this.courseCode,
     required this.status,
@@ -17,39 +20,43 @@ class DisplayTransaction {
 
 /// fetching and consolidating all transaction types into a single, displayable list for the [TransactionsView]
 class TransactionsController {
+  final DatabaseService _dbService = DatabaseService();
+  final AuthService _authService = AuthService();
   List<DisplayTransaction> _transactions = [];
   List<DisplayTransaction> get transactions => _transactions;
 
   Future<void> loadTransactions() async {
+    final UserModel? currentUser = await _authService.getCurrentUserDetails();
+    if (currentUser == null) return;
+
     final results = await Future.wait([
-      rootBundle.loadString('lib/database/borrow_transactions.json'),
-      rootBundle.loadString('lib/database/return_items.json'),
+      _dbService.getBorrowTransactions(currentUser.upMail),
+      _dbService.getReturnItems(currentUser.upMail),
     ]);
+
+    final borrowList = results[0] as List<dynamic>;
+    final returnList = results[1] as List<dynamic>;
     final List<DisplayTransaction> consolidatedList = [];
 
-    final borrowJson = json.decode(results[0]);
-    final List<dynamic> borrowList = borrowJson['borrow_transactions'];
     for (var tx in borrowList) {
-      final int itemCount = (tx['borrowedItems'] as List).length;
+      final itemCount = tx.borrowedItems.length;
       consolidatedList.add(
         DisplayTransaction(
-          courseCode: tx['courseCode'],
+          courseCode: tx.courseCode,
           status: '$itemCount ${itemCount == 1 ? "Item" : "Items"}',
-          date: tx['dateBorrowed'],
+          date: tx.dateBorrowed,
           type: 'Borrow',
         ),
       );
     }
 
-    final returnJson = json.decode(results[1]);
-    final List<dynamic> returnList = returnJson['return_items'];
     for (var item in returnList) {
-      final status = (item['returnedQuantity'] as int) >= (item['quantity'] as int) ? 'COMPLETE' : 'PARTIAL';
+      final status = item.status == ReturnStatus.complete ? 'COMPLETE' : 'PARTIAL';
       consolidatedList.add(
         DisplayTransaction(
-          courseCode: item['courseCode'],
+          courseCode: item.courseCode,
           status: status,
-          date: item['returnDate'],
+          date: item.returnDate,
           type: 'Return',
         ),
       );

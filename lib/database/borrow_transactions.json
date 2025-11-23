@@ -1,13 +1,13 @@
 {
 "borrow_transactions": [
 {
-"transactionId": "TXN-2025-001",
+"borrowId": "TNBRW-2025-001",
 "courseCode": "BIO-107",
 "courseName": "General Biology I",
-"borrowerName": "Alice Smith",
+"borrowerUpMail": "a.smith@up.edu.ph",
 "dateBorrowed": "2025-11-10",
 "deadlineDate": "2025-11-12",
-"groupMembers": ["Alice Smith", "Bob Johnson"],
+"groupMembers": ["a.smith@up.edu.ph", "bajohnson@up.edu.ph"],
 "borrowedItems": [
 {
 "name": "Microscope",
@@ -20,13 +20,13 @@
 ]
 },
 {
-"transactionId": "TXN-2025-002",
+"borrowId": "TNBRW-2025-002",
 "courseCode": "CHEM-102",
 "courseName": "General Chemistry I",
-"borrowerName": "Juan Dela Cruz",
+"borrowerUpMail": "jrdelacruz@up.edu.ph",
 "dateBorrowed": "2025-11-13",
 "deadlineDate": "2025-11-15",
-"groupMembers": ["Juan Dela Cruz", "Maria Garcia", "Li Chen"],
+"groupMembers": ["jrdelacruz@up.edu.ph", "msgarcia@up.edu.ph", "l.chen@up.edu.ph"],
 "borrowedItems": [
 {
 "name": "Beaker (250ml)",
@@ -43,13 +43,13 @@
 ]
 },
 {
-"transactionId": "TXN-2025-003",
+"borrowId": "TNBRW-2025-003",
 "courseCode": "PHYS-103",
 "courseName": "College Physics I",
-"borrowerName": "Sofia Santos",
+"borrowerUpMail": "scsantos@up.edu.ph",
 "dateBorrowed": "2025-11-14",
 "deadlineDate": "2025-11-21",
-"groupMembers": ["Sofia Santos", "David Williams"],
+"groupMembers": ["scsantos@up.edu.ph", "djwilliams@up.edu.ph"],
 "borrowedItems": [
 {
 "name": "Hot Plate",
@@ -58,13 +58,13 @@
 ]
 },
 {
-"transactionId": "TXN-2025-004",
+"borrowId": "TNBRW-2025-004",
 "courseCode": "BIOCHEM-111",
 "courseName": "Fundamentals of Biochemistry",
-"borrowerName": "Li Chen",
+"borrowerUpMail": "l.chen@up.edu.ph",
 "dateBorrowed": "2025-11-05",
 "deadlineDate": "2025-12-05",
-"groupMembers": ["Li Chen"],
+"groupMembers": ["l.chen@up.edu.ph"],
 "borrowedItems": [
 {
 "name": "Graduated Cylinder (100ml)",
@@ -73,13 +73,13 @@
 ]
 },
 {
-"transactionId": "TXN-2025-005",
+"borrowId": "TNBRW-2025-005",
 "courseCode": "CHEM-102",
 "courseName": "General Chemistry I",
-"borrowerName": "Bob Johnson",
+"borrowerUpMail": "bajohnson@up.edu.ph",
 "dateBorrowed": "2025-11-01",
 "deadlineDate": "2025-11-08",
-"groupMembers": ["Bob Johnson", "Alice Smith"],
+"groupMembers": ["bajohnson@up.edu.ph", "a.smith@up.edu.ph"],
 "borrowedItems": [
 {
 "name": "Bunsen Burner",

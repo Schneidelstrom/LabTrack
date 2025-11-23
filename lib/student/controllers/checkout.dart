@@ -1,15 +1,20 @@
-import 'dart:convert';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:labtrack/student/models/borrow_transaction.dart';
 import 'package:labtrack/student/models/cart_item.dart';
 import 'package:labtrack/student/models/course.dart';
 import 'package:labtrack/student/models/user.dart';
 import 'package:labtrack/student/main_screen.dart';
+import 'package:labtrack/student/models/lab_item.dart';
+import 'package:labtrack/student/services/database.dart';
+
 
 /// Managing the cart, group members, course selection, and the final checkout process for the [CheckoutView]
 class CheckoutController {
-  late List<CartItem> _cartItems;
+  final DatabaseService _dbService = DatabaseService();
   final UserModel currentUser;
+  List<CartItem> _cartItems;
+  final List<LabItem> _originalLabItems;
   final Set<UserModel> _groupMembers;
   Course? _selectedCourse;
   List<Course> _allCourses = [];
@@ -18,38 +23,50 @@ class CheckoutController {
   Set<UserModel> get groupMembers => _groupMembers;
   Course? get selectedCourse => _selectedCourse;
   List<Course> get allCourses => _allCourses;
-  CheckoutController({required this.currentUser, required Set<String> selectedItemNames, required Set<UserModel> initialGroupMembers, Course? initialCourse,}) :_cartItems = selectedItemNames.map((name) => CartItem(name: name)).toList(), _groupMembers = initialGroupMembers, _selectedCourse = initialCourse; // Initialize state from data passed by [BorrowView]
+
+  CheckoutController({
+    required this.currentUser,
+    required List<LabItem> selectedItems,
+    required Set<UserModel> initialGroupMembers,
+    Course? initialCourse,
+  }) : _groupMembers = initialGroupMembers, _selectedCourse = initialCourse, _originalLabItems = selectedItems, _cartItems = selectedItems.map((item) => CartItem(name: item.name, quantity: 1)).toList();
 
   Future<void> loadInitialData() async {
-    final jsonStrings = await Future.wait([
-      rootBundle.loadString('lib/database/courses.json'),
-      rootBundle.loadString('lib/database/users.json'),
+    final results = await Future.wait([
+      _dbService.getCourses(),
+      _dbService.getUsers(),
     ]);
 
-    final decodedCourses = json.decode(jsonStrings[0]);
-    final List<dynamic> courseListJson = decodedCourses['courses'];
-    _allCourses = courseListJson.map((jsonItem) {
-      return Course(code: jsonItem['code'], title: jsonItem['title']);
-    }).toList();
-
-    final decodedStudents = json.decode(jsonStrings[1]);
-    final List<dynamic> studentListJson = decodedStudents['users'];
-    _allUsers = studentListJson.map((jsonItem) {
-      return UserModel.fromJson(jsonItem);
-    }).toList();
+    _allCourses = results[0] as List<Course>;
+    _allUsers = results[1] as List<UserModel>;
 
     if (_selectedCourse == null && _allCourses.isNotEmpty) _selectedCourse = _allCourses.first;
   }
 
-  void incrementQuantity(int index) {
-    if (index < _cartItems.length) {
-      final item = _cartItems[index];
-      _cartItems[index] = CartItem(name: item.name, quantity: item.quantity + 1);
+  void incrementQuantity(int index, BuildContext context) {
+    if (index >= _cartItems.length) return;
+
+    final cartItem = _cartItems[index];
+    final originalItem = _originalLabItems.firstWhere((item) => item.name == cartItem.name,);
+
+    if (cartItem.quantity < originalItem.stock) {
+      _cartItems[index] =
+          CartItem(name: cartItem.name, quantity: cartItem.quantity + 1);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Cannot add more. Stock limit for ${cartItem.name} is ${originalItem.stock}.'),
+          backgroundColor: Colors.red.shade700,
+        ),
+      );
     }
   }
 
   void decrementQuantity(int index) {
-    if (index < _cartItems.length && _cartItems[index].quantity > 1) _cartItems[index].quantity--;
+    if (index < _cartItems.length && _cartItems[index].quantity > 1) {
+      final item = _cartItems[index];
+      _cartItems[index] = CartItem(name: item.name, quantity: item.quantity - 1);
+    }
   }
 
   void addGroupMember(UserModel member) {
@@ -71,11 +88,10 @@ class CheckoutController {
 
     return _allUsers.where((user) {
       if (user.upMail == currentUser.upMail) return false;
-      // Exclude students who are already in the group
       final isAlreadyAdded = _groupMembers.any((member) => member.upMail == user.upMail);
       if (isAlreadyAdded) return false;
-      // Match by name
-      return user.fullName.toLowerCase().contains(lowerCasePattern) || user.upMail.toLowerCase().contains(lowerCasePattern);}).take(5); // Limit results for performance
+      return user.fullName.toLowerCase().contains(lowerCasePattern) || user.upMail.toLowerCase().contains(lowerCasePattern);
+    }).take(5);
   }
 
   /// Popping view and returning current state to the [BorrowView]
@@ -96,7 +112,7 @@ class CheckoutController {
       builder: (dialogContext) =>
           AlertDialog(
             title: const Text('Confirm Borrowing'),
-            content: Text('Submit borrow request for ${_selectedCourse!.code} (${_selectedCourse!.title})?'),
+            content: Text('Submit borrow request for ${_selectedCourse!.courseCode} (${_selectedCourse!.title})?'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(dialogContext).pop(false),
@@ -108,12 +124,31 @@ class CheckoutController {
               ),
             ],
           ),
-    );
+      );
 
     if (confirmed == true && context.mounted) {
-      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const MainScreen()), (route) => false,); // Go back to main screen and show a success message on confirmation
+      final allMemberEmails = [currentUser, ..._groupMembers].map((user) => user.upMail).toList();
+      final newTransaction = BorrowTransaction(
+        borrowId: 'TNBRW-${DateFormat('yyyy-MM-dd').format(DateTime.now())}-${currentUser.studentId}-${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}',
+        courseCode: _selectedCourse!.courseCode,
+        courseName: _selectedCourse!.title,
+        borrowerUpMail: currentUser.upMail,
+        dateBorrowed: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+        deadlineDate: DateFormat('yyyy-MM-dd').format(DateTime.now().add(const Duration(days: 7))),
+        groupMembers: allMemberEmails,
+        borrowedItems: _cartItems,
+      );
+
+      await _dbService.addBorrowTransaction(newTransaction);
+
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const MainScreen()), (route) => false
+      );
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Borrow Request Submitted Successfully!'), backgroundColor: Colors.green,),
+        const SnackBar(
+          content: Text('Borrow Request Submitted & Database Updated!'),
+          backgroundColor: Colors.green,
+        ),
       );
     }
   }

@@ -1,54 +1,64 @@
 {
 "lab_items": [
 {
-"name": "Beaker (250ml)",
-"stock": 15,
-"category": "Glassware"
+  "itemId": "1001",
+  "name": "Beaker (250ml)",
+  "stock": 15,
+  "category": "Glassware"
 },
 {
-"name": "Microscope",
-"stock": 3,
-"category": "Equipment"
+  "itemId": "1002",
+  "name": "Microscope",
+  "stock": 3,
+  "category": "Equipment"
 },
 {
-"name": "Bunsen Burner",
-"stock": 8,
-"category": "Heating"
+  "itemId": "1003",
+  "name": "Bunsen Burner",
+  "stock": 8,
+  "category": "Heating"
 },
 {
-"name": "Test Tubes",
-"stock": 50,
-"category": "Glassware"
+  "itemId": "1004",
+  "name": "Test Tubes",
+  "stock": 50,
+  "category": "Glassware"
 },
 {
-"name": "Digital Scale",
-"stock": 0,
-"category": "Measurement"
+  "itemId": "1005",
+  "name": "Digital Scale",
+  "stock": 0,
+  "category": "Measurement"
 },
 {
-"name": "Petri Dish",
-"stock": 100,
-"category": "Glassware"
+  "itemId": "1005",
+  "name": "Petri Dish",
+  "stock": 100,
+  "category": "Glassware"
 },
 {
-"name": "Safety Goggles",
-"stock": 25,
-"category": "Safety"
+  "itemId": "1006",
+  "name": "Safety Goggles",
+  "stock": 25,
+  "category": "Safety"
 },
 {
-"name": "Graduated Cylinder (100ml)",
-"stock": 12,
-"category": "Measurement"
+  "itemId": "1007",
+  "name": "Graduated Cylinder (100ml)",
+  "stock": 12,
+  "category": "Measurement"
 },
 {
-"name": "Hot Plate",
-"stock": 5,
-"category": "Heating"
+  "itemId": "1008",
+  "name": "Hot Plate",
+  "stock": 5,
+  "category": "Heating"
 },
 {
-"name": "Lab Coat (Medium)",
-"stock": 10,
-"category": "Safety"
+  "itemId": "1009",
+  "name": "Lab Coat (Medium)",
+  "stock": 10,
+  "category": "Safety"
 }
 ]
 }

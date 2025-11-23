@@ -1,10 +1,10 @@
-import 'dart:convert';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:labtrack/student/models/borrow_transaction.dart';
-import 'package:labtrack/student/models/cart_item.dart';
 import 'package:labtrack/student/models/user.dart';
-import 'package:labtrack/student/auth.dart';
+import 'package:labtrack/student/models/return_item.dart';
+import 'package:labtrack/student/models/penalty_item.dart';
+import 'package:labtrack/student/services/auth.dart';
+import 'package:labtrack/student/services/database.dart';
 import 'package:labtrack/student/views/borrow.dart';
 import 'package:labtrack/student/views/penalty.dart';
 import 'package:labtrack/student/views/report.dart';
@@ -16,8 +16,10 @@ import 'package:labtrack/student/views/waitlist.dart';
 
 /// Fetching data, managing currently displayed transaction, and handling navigation to other screens for the [DashboardView]
 class DashboardController {
+  final AuthService _authService = AuthService();
+  final DatabaseService _dbService = DatabaseService();
+  UserModel? currentUser;
   List<BorrowTransaction> _borrowedItems = [];
-  int _currentTransactionIndex = 0;
   bool _hasPenalty = false;
   List<Map<String, String>> _waitlistSummary = [];
   List<Map<String, String>> _returnsSummary = [];
@@ -31,61 +33,51 @@ class DashboardController {
   List<Map<String, String>> get returnsSummary => _returnsSummary;
   List<Map<String, String>> get requestsSummary => _requestsSummary;
   List<Map<String, String>> get reportsSummary => _reportsSummary;
-  final AuthService _authService = AuthService();
-  UserModel? currentUser;
+  int _currentTransactionIndex = 0;
 
+  /// Loads all data required for the student dashboard screen
   Future<void> loadData() async {
     currentUser = await _authService.getCurrentUserDetails();
-    final results = await Future.wait([
-      rootBundle.loadString('lib/database/borrow_transactions.json'),
-      rootBundle.loadString('lib/database/waitlist_items.json'),
-      rootBundle.loadString('lib/database/return_items.json'),
-      rootBundle.loadString('lib/database/request_items.json'),
-      rootBundle.loadString('lib/database/reported_items.json'),
-      rootBundle.loadString('lib/database/penalties.json'),
-    ]);
-    final borrowTxJson = json.decode(results[0]);
-    final List<dynamic> borrowTxList = borrowTxJson['borrow_transactions'];
+    if (currentUser == null) {
+      print("Error: Could not load current user details.");
+      _borrowedItems = [];
+      return;
+    }
 
-    _borrowedItems = borrowTxList.map((tx) {
-      final List<dynamic> itemsJson = tx['borrowedItems'];
-      return BorrowTransaction(
-        transactionId: tx['transactionId'],
-        courseCode: tx['courseCode'],
-        courseName: tx['courseName'],
-        borrowerName: tx['borrowerName'],
-        dateBorrowed: tx['dateBorrowed'],
-        deadlineDate: tx['deadlineDate'],
-        groupMembers: List<String>.from(tx['groupMembers']),
-        borrowedItems: itemsJson.map((item) => CartItem(name: item['name'], quantity: item['quantity'])).toList(),
-      );
+    _borrowedItems = await _dbService.getBorrowTransactions(currentUser!.upMail);
+    final waitlistItems = await _dbService.getWaitlistItems(currentUser!.upMail);
+    final returnItems = await _dbService.getReturnItems(currentUser!.upMail);
+    final requestItems = await _dbService.getRequests(currentUser!.upMail);
+    final reportedItems = await _dbService.getReportedItems(currentUser!.upMail);
+    final penalties = await _dbService.getPenalties(currentUser!.upMail);
+
+    _waitlistSummary = waitlistItems.map((item) => {
+      'name': item.courseCode,
+      'status': item.statusMessage
     }).toList();
 
-    final waitlistJson = json.decode(results[1]);
-    _waitlistSummary = (waitlistJson['waitlist_items'] as List<dynamic>).map((item) => <String, String>{'name': item['courseCode'], 'status': item['statusMessage']}).toList();
-
-    final returnsJson = json.decode(results[2]);
-    _returnsSummary = (returnsJson['return_items'] as List<dynamic>).map((item) {
-      final status = (item['returnedQuantity'] as int) >= (item['quantity'] as int) ? 'COMPLETE' : 'PARTIAL';
-      return <String, String>{'name': item['courseCode'], 'status': status};
+    _returnsSummary = returnItems.map((item) {
+      final status = item.status == ReturnStatus.complete ? 'COMPLETE' : 'PARTIAL';
+      return {'name': item.courseCode, 'status': status};
     }).toList();
 
-    final requestsJson = json.decode(results[3]);
-    _requestsSummary = (requestsJson['request_items'] as List<dynamic>).map((item) => <String, String>{'name': item['courseCode'], 'status': '${item['itemCount']}x'}).toList();
+    _requestsSummary = requestItems.map((item) => {
+      'name': item.courseCode,
+      'status': '${item.itemCount}x'
+    }).toList();
 
-    final reportsJson = json.decode(results[4]);
-    _reportsSummary = (reportsJson['reported_items'] as List<dynamic>).map((item) => <String, String>{'name': item['itemName'], 'status': '1x'}).toList();
+    _reportsSummary = reportedItems.map((item) => {'name': item.itemName, 'status': '1x'}).toList();
+    _hasPenalty = penalties.any((p) => p.status == PenaltyStatus.unresolved);
 
-    final penaltiesJson = json.decode(results[5]);
-    _hasPenalty = (penaltiesJson['penalties'] as List<dynamic>).any((p) => p['status'] == 'unresolved');
+    if (_borrowedItems.isNotEmpty && _currentTransactionIndex >= _borrowedItems.length) _currentTransactionIndex = 0;
   }
 
   /// Method to calculate days left until deadline
   static int calculateDaysLeft(String deadlineDate) {
+    if (deadlineDate.isEmpty) return 0;
     final now = DateTime.now();
     final deadline = DateTime.parse(deadlineDate);
-    final difference = deadline.difference(now);
-    return difference.inDays;
+    return deadline.difference(now).inDays;
   }
 
   /// Move to next transaction in list
@@ -136,17 +128,17 @@ class DashboardController {
 
   void navigateToBorrow(BuildContext context) {
     if (currentUser == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("User data not loaded. Please wait."))
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Could not load user data. Please try again later.")));
       return;
     }
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => BorrowView(currentUser: currentUser!),
-    ));
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => BorrowView(currentUser: currentUser!),));
   }
 
   void navigateToReport(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ReportView()));
+    if (currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("User data not loaded. Please wait.")));
+      return;
+    }
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => ReportView(currentUser: currentUser!),));
   }
 }

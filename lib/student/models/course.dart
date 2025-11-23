@@ -1,19 +1,24 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Course {
-  final String code;
+  final String courseCode;
   final String title;
 
   const Course({
-    required this.code,
+    required this.courseCode,
     required this.title,
   });
 
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is Course && other.code == code && other.title == title;
+  factory Course.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return Course(
+      courseCode: data['courseCode'] ?? '',
+      title: data['title'] ?? '',
+    );
   }
 
-  @override
-  int get hashCode => code.hashCode ^ title.hashCode;
+  Map<String, dynamic> toJson() => {
+    'courseCode': courseCode,
+    'title': title,
+  };
 }

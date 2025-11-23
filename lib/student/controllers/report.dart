@@ -1,10 +1,14 @@
-import 'dart:convert';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:labtrack/student/models/cart_item.dart';
+import 'package:labtrack/student/models/report_item.dart';
+import 'package:labtrack/student/models/user.dart';
+import 'package:labtrack/student/services/database.dart';
 
 /// Fetching borrowed items, managing reporting state (list vs. form), and handling submission of new report for the [ReportView]
 class ReportController {
+  final DatabaseService _dbService = DatabaseService();
+  final UserModel currentUser;
   List<CartItem> _borrowedItems = [];
   bool _isReporting = false;
   CartItem? _itemToReport;
@@ -12,21 +16,20 @@ class ReportController {
   bool get isReporting => _isReporting;
   CartItem? get itemToReport => _itemToReport;
 
+  ReportController({required this.currentUser});
+
   Future<void> loadBorrowedItems() async {
-    final String jsonString = await rootBundle.loadString('lib/database/borrow_transactions.json');
-    final Map<String, dynamic> decodedJson = json.decode(jsonString);
-    final List<dynamic> transactionsList = decodedJson['borrow_transactions'];
+    final allTransactions = await _dbService.getBorrowTransactions(currentUser.upMail);
+    final userTransactions = allTransactions.where((tx) => tx.groupMembers.contains(currentUser.upMail)).toList();
     final Map<String, int> aggregatedItems = {};
 
-    for (var transaction in transactionsList) {
-      final List<dynamic> itemsInTransaction = transaction['borrowedItems'];
-      for (var item in itemsInTransaction) {
-        final String itemName = item['name'];
-        final int quantity = item['quantity'];
-        aggregatedItems.update(itemName, (value) => value + quantity, ifAbsent: () => quantity);
+    for (var transaction in userTransactions) {
+      for (var item in transaction.borrowedItems) {
+        aggregatedItems.update(item.name, (value) => value + item.quantity,
+            ifAbsent: () => item.quantity);
       }
     }
-    
+
     _borrowedItems = aggregatedItems.entries.map((entry) {
       return CartItem(name: entry.key, quantity: entry.value);
     }).toList();
@@ -45,14 +48,26 @@ class ReportController {
   }
 
   /// Handle final submission of report
-  void submitReport(BuildContext context) {
-    print('Report submitted for ${_itemToReport?.name}');
-    cancelReporting();  // Switch back to list view after submission
+  Future<void> submitReport(BuildContext context) async {
+    if (_itemToReport == null) return;
 
-  // Show confirmation message to the user
+    final newReport = ReportedItem(
+      reportId: 'TNREP-${DateFormat('yyyy-MM-dd').format(DateTime.now())}-${currentUser.studentId}-${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}',
+      itemName: _itemToReport!.name,
+      reporterUpMail: currentUser.upMail,
+      reportDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+      status: ReportStatus.underReview,
+    );
+
+    await _dbService.addReport(newReport);
+    cancelReporting();
+
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Report submitted successfully!'), backgroundColor: Colors.green,),
+        const SnackBar(
+          content: Text('Report submitted successfully!'),
+          backgroundColor: Colors.green,
+        ),
       );
     }
   }

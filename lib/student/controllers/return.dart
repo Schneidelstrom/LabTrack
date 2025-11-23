@@ -1,32 +1,27 @@
-import 'dart:convert';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:labtrack/student/models/return_item.dart';
+import 'package:labtrack/student/services/database.dart';
+import 'package:labtrack/student/services/auth.dart';
+import 'package:labtrack/student/models/user.dart';
 
 /// Fetching user return history and handling navigation to details for the [ReturnView]
 class ReturnController {
+  final DatabaseService _dbService = DatabaseService();
+  final AuthService _authService = AuthService();
   List<ReturnItem> _returnItems = [];
   List<ReturnItem> get returnItems => _returnItems;
 
   Future<void> loadReturnItems() async {
-    final String jsonString = await rootBundle.loadString('lib/database/return_items.json');
-    final Map<String, dynamic> decodedJson = json.decode(jsonString);
-    final List<dynamic> returnListJson = decodedJson['return_items'];
-
-    _returnItems = returnListJson.map((jsonItem) {
-      return ReturnItem(
-        courseCode: jsonItem['courseCode'],
-        borrowDate: jsonItem['borrowDate'],
-        returnDate: jsonItem['returnDate'],
-        quantity: jsonItem['quantity'],
-        returnedQuantity: jsonItem['returnedQuantity'],
-      );
-    }).toList();
+    final UserModel? currentUser = await _authService.getCurrentUserDetails();
+    if (currentUser == null) return;
+    _returnItems = await _dbService.getReturnItems(currentUser.upMail);
   }
 
   void viewReturnDetails(BuildContext context, ReturnItem item) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Viewing details for ${item.courseCode} return...'),),
+      SnackBar(
+        content: Text('Viewing details for ${item.courseCode} return...'),
+      ),
     );
   }
 }

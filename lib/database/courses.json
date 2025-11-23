@@ -1,31 +1,31 @@
 {
 "courses": [
 {
-"code": "BIO-107",
+"courseCode": "BIO-107",
 "title": "General Biology I"
 },
 {
-"code": "CHEM-102",
+"courseCode": "CHEM-102",
 "title": "General Chemistry I"
 },
 {
-"code": "PHYS-103",
+"courseCode": "PHYS-103",
 "title": "College Physics I"
 },
 {
-"code": "CMSC-128",
+"courseCode": "CMSC-128",
 "title": "Introduction to Software Design"
 },
 {
-"code": "MATH-154",
+"courseCode": "MATH-154",
 "title": "Differential Calculus"
 },
 {
-"code": "ENVI-SCI-100",
+"courseCode": "ENVI-SCI-100",
 "title": "Introduction to Environmental Science"
 },
 {
-"code": "BIOCHEM-111",
+"courseCode": "BIOCHEM-111",
 "title": "Fundamentals of Biochemistry"
 }
 ]

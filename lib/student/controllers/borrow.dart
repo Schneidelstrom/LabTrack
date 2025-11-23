@@ -1,46 +1,56 @@
-import 'dart:convert';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:labtrack/student/models/course.dart';
 import 'package:labtrack/student/models/user.dart';
 import 'package:labtrack/student/models/lab_item.dart';
 import 'package:labtrack/student/views/checkout.dart';
+import 'package:labtrack/student/services/database.dart';
 
 /// Fetching available items, managing selection of items, and navigating to checkout screen for the [BorrowView]
 class BorrowController {
-  List<LabItem> _items = [];
-  final Set<String> _selectedItemNames = {};
+  final DatabaseService _dbService = DatabaseService();
   final UserModel currentUser;
+  List<LabItem> _items = [];
+  List<LabItem> filteredItems = [];
+  final Set<String> _selectedItemNames = {};
   Set<UserModel> _retainedGroupMembers = {};
   Course? _retainedCourse;
-  List<LabItem> get items => _items;
+  List<LabItem> get items => filteredItems;
   int get selectedItemCount => _selectedItemNames.length;
   bool isSelected(LabItem item) => _selectedItemNames.contains(item.name);
+  Set<String> get uniqueCategories => _items.map((item) => item.category).toSet();
 
   BorrowController({required this.currentUser});
 
   Future<void> loadItems() async {
-    final String jsonString = await rootBundle.loadString('lib/database/lab_items.json');
-    final Map<String, dynamic> decodedJson = json.decode(jsonString);
-    final List<dynamic> itemListJson = decodedJson['lab_items'];
+    _items = await _dbService.getLabItems();
+    filteredItems = _items;
+  }
 
-    _items = itemListJson.map((jsonItem) {
-      return LabItem(
-        name: jsonItem['name'],
-        stock: jsonItem['stock'],
-        category: jsonItem['category'],
-      );
-    }).toList();
+  void applyFilters({String? searchTerm, String? category}) {
+    List<LabItem> result = _items;
+    if (searchTerm != null && searchTerm.isNotEmpty) result = result.where((item) => item.name.toLowerCase().contains(searchTerm.toLowerCase())).toList();
+    if (category != null && category.isNotEmpty) result = result.where((item) => item.category == category).toList();
+    filteredItems = result;
   }
 
   /// Selection state toggle
-  void toggleItemSelection(LabItem item) {
+  void toggleItemSelection(LabItem item, BuildContext context) {
     if (_selectedItemNames.contains(item.name)) {
       _selectedItemNames.remove(item.name);
     } else {
-      _selectedItemNames.add(item.name);
+      if (item.stock > 0) {
+        _selectedItemNames.add(item.name);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${item.name} is out of stock.'),
+            backgroundColor: Colors.red.shade700,
+          ),
+        );
+      }
     }
   }
+
 
   /// When the user tries to navigate back to dashboard
   Future<bool> onWillPop(BuildContext context) async {
@@ -48,15 +58,21 @@ class BorrowController {
     return await _showExitConfirmationDialog(context) ?? false; // Show dialog asking user to exit confirm
   }
 
-  /// Navigates to the checkout view, passing the current state.
-  /// It awaits the result from the checkout view to update its retained state.
+  /// Navigates to the checkout view
   Future<void> navigateToCheckout(BuildContext context) async {
+    final selectedLabItems = _items.where((item) => _selectedItemNames.contains(item.name)).toList();
+
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => CheckoutView(currentUser: currentUser, selectedItems: _selectedItemNames, initialGroupMembers: _retainedGroupMembers, initialCourse: _retainedCourse,),
+        builder: (context) => CheckoutView(
+          currentUser: currentUser,
+          selectedItems: selectedLabItems,
+          initialGroupMembers: _retainedGroupMembers,
+          initialCourse: _retainedCourse,
+        ),
       ),
     );
-    // Update the retained state
+
     if (result is Map<String, dynamic>) {
       _retainedGroupMembers = result['groupMembers'] as Set<UserModel>;
       _retainedCourse = result['course'] as Course?;
@@ -80,7 +96,7 @@ class BorrowController {
               child: const Text('Yes'),
               onPressed: () {
                 Navigator.of(dialogContext).pop(true);
-                Navigator.of(context).pushNamedAndRemoveUntil('/main', (route) => false,);
+                Navigator.of(context).pushNamedAndRemoveUntil('/main', (route) => false);
               },
             ),
           ],
