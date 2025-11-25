@@ -40,7 +40,7 @@ class CheckoutController {
     _allCourses = results[0] as List<Course>;
     _allUsers = results[1] as List<UserModel>;
 
-    if (_selectedCourse == null && _allCourses.isNotEmpty) _selectedCourse = _allCourses.first;
+    if (_selectedCourse == null && _allCourses.isNotEmpty) _selectedCourse = _allCourses.first; // Set default course as the first course in the list
   }
 
   void incrementQuantity(int index, BuildContext context) {
@@ -50,8 +50,7 @@ class CheckoutController {
     final originalItem = _originalLabItems.firstWhere((item) => item.name == cartItem.name,);
 
     if (cartItem.quantity < originalItem.stock) {
-      _cartItems[index] =
-          CartItem(name: cartItem.name, quantity: cartItem.quantity + 1);
+      _cartItems[index] = CartItem(name: cartItem.name, quantity: cartItem.quantity + 1);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

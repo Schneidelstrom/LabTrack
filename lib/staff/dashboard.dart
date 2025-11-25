@@ -123,7 +123,6 @@ class _StaffDashboardState extends State<StaffDashboard> {
   }
 
   Widget _buildTopBar() {
-    // Personalized welcome message
     final userName = _controller.currentUser?.firstName ?? 'Staff';
     return Container(
       height: 64,
@@ -135,7 +134,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
       child: Row(
         children: [
           const Spacer(),
-          Text('Welcome, $userName', style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text('Welcome, $userName', style: const TextStyle(fontWeight: FontWeight.w600)),  // Personalized welcome message
           const SizedBox(width: 16),
           IconButton(onPressed: () {}, icon: const Icon(Icons.notifications_none)),
           const SizedBox(width: 8),

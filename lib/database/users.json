@@ -98,6 +98,17 @@
       "ylevel": 1,
       "cnumber": "09138901234",
       "role": "student"
+    },
+    {
+      "upmail": "jipetilla@up.edu.ph",
+      "fname": "Jade Eric",
+      "mname": "Indic",
+      "lname": "Petilla",
+      "sid": "2023-05021",
+      "dprogram": "BS Computer Science",
+      "ylevel": 3,
+      "cnumber": "09124569511",
+      "role": "student"
     }
   ]
 }

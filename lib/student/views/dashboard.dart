@@ -28,6 +28,7 @@ class _DashboardViewState extends State<DashboardView> {
   void _refreshDashboard(dynamic value) {
     if (value is int) setState(() {_controller.setCurrentTransactionIndex(value);});  // Update if transaction viewer returns a new index
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

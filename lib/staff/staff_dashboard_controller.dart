@@ -66,15 +66,17 @@ class StaffDashboardController {
     final totalBorrowed = transaction.borrowedItems.fold<int>(0, (sum, item) => sum + item.quantity);
     final totalReturned = returnedItemsList.fold<int>(0, (sum, item) => sum + item.quantity);
 
+    print(transaction.borrowerUpMail);
+
     // Create a record for the return_items collection.
     final newReturnRecord = ReturnItem(
-      returnId: 'TNRTN-${DateTime.now().millisecondsSinceEpoch}',
+      returnId: 'TNRTN-${DateFormat('yyyy-MM-dd').format(DateTime.now())}-${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}',
       courseCode: transaction.courseCode,
       borrowDate: transaction.dateBorrowed,
       returnDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
       quantity: totalBorrowed,
       returnedQuantity: totalReturned,
-      returnerUpMail: transaction.borrowerUpMail, // Assumes the borrower is the returner
+      returnerUpMail: transaction.borrowerUpMail,
     );
 
     try {
